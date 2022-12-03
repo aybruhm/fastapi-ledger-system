@@ -1,2 +1,5 @@
 # package dependencies
 env/
+
+# cache dependencies
+__pycache__/
