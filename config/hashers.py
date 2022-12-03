@@ -63,8 +63,8 @@ class PasswordHasher:
         """
 
 
-        password_salt = user.hashed_password["salt"]
-        password_key = user.hashed_password["key"]
+        password_salt = user.password["salt"]
+        password_key = user.password["key"]
 
         hashed_password = hashlib.pbkdf2_hmac(
             hash_name="sha256",
