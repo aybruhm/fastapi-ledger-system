@@ -1,8 +1,12 @@
 # FastAPI Imports
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException
+
+# SQLAlchemy Imports
+from sqlalchemy.orm import Session
 
 # Own Imports
-from ledger import models
+from ledger import models, schemas, services
+from ledger.constants import get_db
 from config import database
 
 app = FastAPI(title="Ledger System", version=1.0)
@@ -20,14 +24,19 @@ async def ledger_home() -> dict:
     return {"v1": "Welcome to Ledger Fintech!"}
 
 
-@app.post("/users/")
-async def create_new_user():
-    return {}
+@app.post("/users/", response_model=schemas.UserCreate)
+async def create_new_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    db_user = services.get_user_by_email(db, user.email)
+
+    if db_user:
+        raise HTTPException(400, {"message": "User already exists!"})
+    return services.create_user(db, user=user)
 
 
-@app.get("/users/{user_id}/")
-async def user_info(user_id: int):
-    return {}
+@app.get("/users/{user_id}/", response_model=schemas.User)
+async def user_info(user_id: int, db: Session = Depends(get_db)):
+    db_user = services.get_user(db, user_id)
+    return db_user
 
 
 @app.post("/deposit/")
