@@ -1,7 +1,12 @@
 # FastAPI Imports
 from fastapi import FastAPI
 
-app = FastAPI()
+# Own Imports
+from ledger import models
+from config import database
+
+app = FastAPI(title="Ledger System", version=1.0)
+models.Base.metadata.create_all(bind=database.DB_ENGINE)
 
 
 @app.get("/")
