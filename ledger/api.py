@@ -33,6 +33,12 @@ async def create_new_user(user: schemas.UserCreate, db: Session = Depends(get_db
     return services.create_user(db, user=user)
 
 
+@app.get("/users/", response_model=list[schemas.User])
+async def users_info(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    db_users = services.get_users(db, skip, limit)
+    return db_users
+
+
 @app.get("/users/{user_id}/", response_model=schemas.User)
 async def user_info(user_id: int, db: Session = Depends(get_db)):
     db_user = services.get_user(db, user_id)
