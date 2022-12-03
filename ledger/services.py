@@ -12,8 +12,8 @@ pwd_hasher = PasswordHasher()
 
 def create_user(db: Session, user: schemas.UserCreate):
 
-    hashed_password = pwd_hasher.hash_password(user.hashed_password)
-    db_user = models.User(email=user.email, hashed_password=hashed_password)
+    hashed_password = pwd_hasher.hash_password(user.password)
+    db_user = models.User(email=user.email, name=user.name, hashed_password=hashed_password)
 
     db.add(db_user)
     db.commit()

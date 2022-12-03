@@ -15,12 +15,12 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
     email = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
+    password = Column(String)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.datetime.now)
     updated_at = Column(DateTime, onupdate=datetime.datetime.now)
 
-    wallets = relationship("Wallet", back_populates="owner")
+    wallets = relationship("Wallet")
 
 
 class Wallet(Base):
