@@ -15,6 +15,16 @@ async def ledger_home() -> dict:
     return {"v1": "Welcome to Ledger Fintech!"}
 
 
+@app.post("/users/")
+async def create_new_user():
+    return {}
+
+
+@app.get("/users/{user_id}/")
+async def user_info(user_id: int):
+    return {}
+
+
 @app.post("/deposit/")
 async def deposit_money() -> dict:
     return {}
