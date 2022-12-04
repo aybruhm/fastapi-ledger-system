@@ -34,9 +34,9 @@ def get_user_by_email(db: Session, user_email: str):
     return db.query(models.User).filter(models.User.email == user_email).first()
 
 
-def create_wallet(db: Session, user_id: int, wallet: schemas.WalletCreate):
+def create_wallet(db: Session, wallet: schemas.WalletCreate):
 
-    db_wallet = models.Wallet(user=user_id, title=wallet.title, amount=wallet.amount)
+    db_wallet = models.Wallet(title=wallet.title, amount=wallet.amount)
 
     db.add(db_wallet)
     db.commit()
@@ -45,11 +45,11 @@ def create_wallet(db: Session, user_id: int, wallet: schemas.WalletCreate):
     return db_wallet
 
 
-def deposit_money_to_wallet(db: Session, user_id: int, wallet: schemas.WalletDeposit):
-    
+def deposit_money_to_wallet(db: Session, wallet: schemas.WalletDeposit):
+
     return ...
 
 
-def withdraw_money_from_wallet(db: Session, user_id: int, wallet: schemas.WalletWithdraw):
-    
+def withdraw_money_from_wallet(db: Session, wallet: schemas.WalletWithdraw):
+
     return ...
