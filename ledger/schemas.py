@@ -12,7 +12,7 @@ class WalletCreate(WalletBase):
 
 
 class WalletDeposit(WalletBase):
-    pass
+    id: int
 
 
 class WalletWithdraw(WalletBase):
