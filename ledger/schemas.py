@@ -3,17 +3,26 @@ from pydantic import BaseModel
 
 
 class WalletBase(BaseModel):
-    title: str
     amount: int
 
 
 class WalletCreate(WalletBase):
     user: int
+    title: str
+    
+    
+class WalletDeposit(WalletBase):
+    pass
+
+
+class WalletWithdraw(WalletBase):
+    pass
 
 
 class Wallet(WalletBase):
     id: int
     user: int
+    title: str
 
     class Config:
         # Without orm_mode, if you returned a SQLAlchemy
