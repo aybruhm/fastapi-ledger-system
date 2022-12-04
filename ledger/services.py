@@ -36,13 +36,19 @@ def get_user_by_email(db: Session, user_email: str):
 
 def create_wallet(db: Session, wallet: schemas.WalletCreate):
 
-    db_wallet = models.Wallet(title=wallet.title, amount=wallet.amount)
+    db_wallet = models.Wallet(
+        title=wallet.title, user=wallet.user, amount=wallet.amount
+    )
 
     db.add(db_wallet)
     db.commit()
     db.refresh(db_wallet)
 
     return db_wallet
+
+
+def get_all_wallets(db: Session, skip: int, limit: int):
+    return db.query(models.Wallet).offset(skip).limit(limit).all()
 
 
 def deposit_money_to_wallet(db: Session, wallet: schemas.WalletDeposit):
