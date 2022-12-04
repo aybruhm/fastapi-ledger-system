@@ -62,20 +62,20 @@ def get_wallets(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return db_wallets
 
 
-@app.post("/deposit/", response_model=schemas.Wallet, tags=["Ledger"])
+@app.post("/deposit/", tags=["Ledger"])
 async def deposit_money(
-    wallet: schemas.WalletDeposit, db: Session = Depends(get_db)
+    deposit: schemas.WalletDeposit, db: Session = Depends(get_db)
 ) -> dict:
-    db_wallet = services.deposit_money_to_wallet(db, wallet)
-    return db_wallet
+    services.deposit_money_to_wallet(db, deposit)
+    return {"message": f"{deposit.amount} deposit successful!"}
 
 
-@app.post("/withdraw/", response_model=schemas.Wallet, tags=["Ledger"])
+@app.post("/withdraw/", tags=["Ledger"])
 async def withdraw_money(
-    wallet: schemas.WalletDeposit, db: Session = Depends(get_db)
+    withdraw: schemas.WalletWithdraw, db: Session = Depends(get_db)
 ) -> dict:
-    db_wallet = services.withdraw_money_from_wallet(db, wallet)
-    return db_wallet
+    services.withdraw_money_from_wallet(db, withdraw)
+    return {"message": f"{withdraw.amount} withdrawn successful!"}
 
 
 @app.post(
