@@ -76,6 +76,12 @@ def deposit_money_to_wallet(db: Session, deposit: schemas.WalletDeposit):
     return topup_wallet
 
 
-def withdraw_money_from_wallet(db: Session, wallet: schemas.WalletWithdraw):
+def withdraw_money_from_wallet(db: Session, withdraw: schemas.WalletWithdraw):
 
-    return ...
+    withdraw_wallet = get_single_wallet(db, withdraw.user, withdraw.id)
+    withdraw_wallet.amount -= withdraw.amount
+
+    db.commit()
+    db.refresh(withdraw_wallet)
+
+    return withdraw_wallet
