@@ -3,14 +3,14 @@ from pydantic import BaseModel
 
 
 class WalletBase(BaseModel):
+    user: int
     amount: int
 
 
 class WalletCreate(WalletBase):
-    user: int
     title: str
-    
-    
+
+
 class WalletDeposit(WalletBase):
     pass
 
@@ -21,7 +21,6 @@ class WalletWithdraw(WalletBase):
 
 class Wallet(WalletBase):
     id: int
-    user: int
     title: str
 
     class Config:
