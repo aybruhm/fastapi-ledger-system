@@ -1,6 +1,9 @@
 # SQLAlchemy Imports
 from sqlalchemy.orm import Session
 
+# FastAPI Imports
+from fastapi import HTTPException
+
 # Own Imports
 from ledger import schemas, models
 from config.hashers import PasswordHasher
@@ -51,9 +54,26 @@ def get_all_wallets(db: Session, skip: int, limit: int):
     return db.query(models.Wallet).offset(skip).limit(limit).all()
 
 
-def deposit_money_to_wallet(db: Session, wallet: schemas.WalletDeposit):
+def get_single_wallet(db: Session, user_id: int, wallet_id: int):
+    db_wallet = (
+        db.query(models.Wallet)
+        .filter(models.User.id == user_id, models.Wallet.id == wallet_id)
+        .first()
+    )
 
-    return ...
+    if db_wallet:
+        return db_wallet
+    raise HTTPException(400, {"message": "Wallet does not exist!"})
+
+
+def deposit_money_to_wallet(db: Session, deposit: schemas.WalletDeposit):
+    topup_wallet = get_single_wallet(db, deposit.user, deposit.id)
+    topup_wallet.amount += deposit.amount
+
+    db.commit()
+    db.refresh(topup_wallet)
+
+    return topup_wallet
 
 
 def withdraw_money_from_wallet(db: Session, wallet: schemas.WalletWithdraw):
