@@ -43,3 +43,13 @@ def create_wallet(db: Session, user_id: int, wallet: schemas.WalletCreate):
     db.refresh(db_wallet)
 
     return db_wallet
+
+
+def deposit_money_to_wallet(db: Session, user_id: int, wallet: schemas.WalletDeposit):
+    
+    return ...
+
+
+def withdraw_money_from_wallet(db: Session, user_id: int, wallet: schemas.WalletWithdraw):
+    
+    return ...
