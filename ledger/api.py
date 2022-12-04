@@ -9,6 +9,7 @@ from ledger import models, schemas, services
 from ledger.constants import get_db
 from config import database
 
+
 app = FastAPI(title="Ledger System", version=1.0)
 models.Base.metadata.create_all(bind=database.DB_ENGINE)
 
@@ -24,12 +25,14 @@ async def ledger_home() -> dict:
     return {"v1": "Welcome to Ledger Fintech!"}
 
 
-@app.post("/users/", response_model=schemas.UserCreate)
+@app.post("/users/", response_model=schemas.User)
 async def create_new_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = services.get_user_by_email(db, user.email)
 
     if db_user:
         raise HTTPException(400, {"message": "User already exists!"})
+    
+    payload = {"message"}
     return services.create_user(db, user=user)
 
 
