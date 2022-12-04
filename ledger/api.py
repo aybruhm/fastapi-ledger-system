@@ -50,14 +50,22 @@ async def user_info(user_id: int, db: Session = Depends(get_db)):
     return db_user
 
 
-@app.post("/deposit/", tags=["Ledger"])
-async def deposit_money() -> dict:
-    return {}
+@app.post("/wallets/", response_model=schemas.Wallet, tags=["Ledger"])
+def create_wallet(wallet: schemas.WalletCreate, db: Session = Depends(get_db)):
+    db_wallet = services.create_wallet(db, wallet)
+    return db_wallet
 
 
-@app.post("/withdraw/", tags=["Ledger"])
-async def withdraw_money() -> dict:
-    return {}
+@app.post("/deposit/", response_model=schemas.Wallet, tags=["Ledger"])
+async def deposit_money(wallet: schemas.WalletDeposit, db: Session = Depends(get_db)) -> dict:
+    db_wallet = services.deposit_money_to_wallet(db, wallet)
+    return db_wallet
+
+
+@app.post("/withdraw/", response_model=schemas.Wallet, tags=["Ledger"])
+async def withdraw_money(wallet: schemas.WalletDeposit, db: Session = Depends(get_db)) -> dict:
+    db_wallet = services.withdraw_money_from_wallet(db, wallet)
+    return db_wallet
 
 
 @app.post(
