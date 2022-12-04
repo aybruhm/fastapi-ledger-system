@@ -16,7 +16,7 @@ class WalletDeposit(WalletBase):
 
 
 class WalletWithdraw(WalletBase):
-    pass
+    id: int
 
 
 class Wallet(WalletBase):
