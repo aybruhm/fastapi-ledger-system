@@ -335,6 +335,20 @@ def get_total_wallet_balance(db: Session, skip: int, limit: int, user_id: int):
 
 
 def get_wallet_balance(db: Session, user_id: int, wallet_id: int):
+    """
+    This function gets the balance of a single wallet.
+    
+    :param db: Session - this is the database session that we created in the main.py file
+    :type db: Session
+    
+    :param user_id: The user_id of the user who owns the wallet
+    :type user_id: int
+    
+    :param wallet_id: The id of the wallet you want to get the balance of
+    :type wallet_id: int
+    
+    :return: The balance of the wallet
+    """
     
     wallet = get_single_wallet(db, user_id, wallet_id)
     balance = wallet.amount
