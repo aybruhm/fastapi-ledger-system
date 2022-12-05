@@ -67,7 +67,7 @@ async def deposit_money(
     deposit: schemas.WalletDeposit, db: Session = Depends(get_db)
 ) -> dict:
     services.deposit_money_to_wallet(db, deposit)
-    return {"message": f"{deposit.amount} deposit successful!"}
+    return {"message": f"NGN{deposit.amount} deposit successful!"}
 
 
 @app.post("/withdraw/", tags=["Ledger"])
@@ -75,24 +75,30 @@ async def withdraw_money(
     withdraw: schemas.WalletWithdraw, db: Session = Depends(get_db)
 ) -> dict:
     services.withdraw_money_from_wallet(db, withdraw)
-    return {"message": f"{withdraw.amount} withdrawn successful!"}
+    return {"message": f"NGN{withdraw.amount} withdrawn successful!"}
 
 
-@app.post(
-    "/transfer/wallet-to-wallet/{wallet_from_id}/", tags=["Ledger"]
-)
+@app.post("/transfer/wallet-to-wallet/{wallet_from_id}/", tags=["Ledger"])
 async def wallet_to_wallet_transfer(
     wallet_from_id: int, withdraw: schemas.WalletWithdraw, db: Session = Depends(get_db)
 ) -> dict:
     services.withdraw_from_to_wallet_transfer(db, wallet_from_id, withdraw)
     return {
-        "message": f"{withdraw.amount} was transfered from {wallet_from_id} wallet to {withdraw.id} wallet!"
+        "message": f"NGN{withdraw.amount} was transfered from W#{wallet_from_id} wallet to W#{withdraw.id} wallet!"
     }
 
 
-@app.post("/transfer/wallet-to-user/{wallet_id}/{user_id}", tags=["Ledger"])
-async def wallet_to_user_transfer(user_id: int) -> dict:
-    return {}
+@app.post("/transfer/wallet-to-user/{user_id}/{wallet_to_id}/", tags=["Ledger"])
+async def wallet_to_user_transfer(
+    user_id: int,
+    wallet_to_id: int,
+    withdraw: schemas.WalletWithdraw,
+    db: Session = Depends(get_db),
+) -> dict:
+    services.withdraw_from_to_user_wallet_transfer(db, user_id, wallet_to_id, withdraw)
+    return {
+        "message": f"Transferred NGN{withdraw.amount} to W#{wallet_to_id} U#{user_id} wallet."
+    }
 
 
 @app.get("/balance/", tags=["Ledger"])
@@ -100,6 +106,6 @@ async def total_wallet_balance() -> dict:
     return {}
 
 
-@app.get("/balance/wallet/{wallet_id}", tags=["Ledger"])
+@app.get("/balance/wallet/{wallet_id}/", tags=["Ledger"])
 async def wallet_balance(wallet_id: int) -> dict:
     return {}
