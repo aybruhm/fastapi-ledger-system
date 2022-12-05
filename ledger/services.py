@@ -191,7 +191,8 @@ def get_single_wallet(db: Session, user_id: int, wallet_id: int):
     db_wallet = (
         db.query(models.Wallet)
         .join(models.Wallet.owner)
-        .filter(models.User.id == user_id, models.Wallet.id == wallet_id)
+        .filter(models.User.id == user_id)
+        .filter(models.Wallet.id == wallet_id)
         .first()
     )
 
