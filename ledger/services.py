@@ -307,9 +307,28 @@ def withdraw_from_to_user_wallet_transfer(
 
 
 def get_total_wallet_balance(db: Session, skip: int, limit: int, user_id: int):
+    """
+    This function gets all wallets for a user, then sum up the amount of each wallet.
+    
+    :param db: Session - this is the database session that we created in the previous step
+    :type db: Session
+    
+    :param skip: the number of records to skip
+    :type skip: int
+    
+    :param limit: The number of wallets to return
+    :type limit: int
+    
+    :param user_id: The user id of the user whose wallets you want to get
+    :type user_id: int
+    
+    :return: The total balance of all wallets for a user.
+    """
+    
     wallets = get_all_wallets_by_user(db, skip, limit, user_id)
 
     total_balance = 0
     for wallet in wallets:
         total_balance += wallet.amount
     return total_balance
+
