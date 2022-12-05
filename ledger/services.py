@@ -190,6 +190,7 @@ def get_single_wallet(db: Session, user_id: int, wallet_id: int):
     """
     db_wallet = (
         db.query(models.Wallet)
+        .join(models.Wallet.owner)
         .filter(models.User.id == user_id, models.Wallet.id == wallet_id)
         .first()
     )
@@ -332,3 +333,9 @@ def get_total_wallet_balance(db: Session, skip: int, limit: int, user_id: int):
         total_balance += wallet.amount
     return total_balance
 
+
+def get_wallet_balance(db: Session, user_id: int, wallet_id: int):
+    
+    wallet = get_single_wallet(db, user_id, wallet_id)
+    balance = wallet.amount
+    return balance
