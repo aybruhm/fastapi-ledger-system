@@ -110,6 +110,6 @@ async def total_wallet_balance(
 
 
 @app.get("/balance/wallet/", tags=["Ledger"])
-async def wallet_balance(user_id: int, wallet_id: int) -> dict:
-    wallet = services.get_total_wallet_balance()
-    return {"message": f""}
+async def wallet_balance(user_id: int, wallet_id: int, db: Session = Depends(get_db)) -> dict:
+    balance = services.get_wallet_balance(db, user_id, wallet_id)
+    return {"message": f"Wallet balance is NGN{balance}"}
