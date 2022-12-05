@@ -130,16 +130,16 @@ def create_wallet(db: Session, wallet: schemas.WalletCreate):
 def get_all_wallets(db: Session, skip: int, limit: int):
     """
     This function gets all wallets from the database.
-    
+
     :param db: Session: This is the database session that we created in the previous section
     :type db: Session
-    
+
     :param skip: The number of records to skip
     :type skip: int
-    
+
     :param limit: The maximum number of wallets to return
     :type limit: int
-    
+
     :return: A list of all the wallets in the database.
     """
     return db.query(models.Wallet).offset(skip).limit(limit).all()
@@ -148,23 +148,24 @@ def get_all_wallets(db: Session, skip: int, limit: int):
 def get_all_wallets_by_user(db: Session, skip: int, limit: int, user_id: int):
     """
     Tjis function gets all wallets for a user.
-    
+
     :param db: Session - the database session
     :type db: Session
-    
+
     :param skip: The number of records to skip
     :type skip: int
-    
+
     :param limit: The maximum number of items to return
     :type limit: int
-    
+
     :param user_id: The id of the user whose wallets you want to retrieve
     :type user_id: int
-    
+
     :return: A list of all wallets for a given user.
     """
     return (
         db.query(models.Wallet)
+        .join(models.Wallet.owner)
         .filter(models.User.id == user_id)
         .offset(skip)
         .limit(limit)
@@ -305,6 +306,10 @@ def withdraw_from_to_user_wallet_transfer(
     return to_wallet
 
 
-def get_total_wallet_balance(db: Session, user_id: int, wallet_id: int):
-    wallet = get_single_wallet(db, user_id, wallet_id)
-    return wallet
+def get_total_wallet_balance(db: Session, skip: int, limit: int, user_id: int):
+    wallets = get_all_wallets_by_user(db, skip, limit, user_id)
+
+    total_balance = 0
+    for wallet in wallets:
+        total_balance += wallet.amount
+    return total_balance
