@@ -210,18 +210,49 @@ def withdraw_from_to_wallet_transfer(
 
     :param db: Session, from_wallet_id: int, withdraw: schemas.WalletWithdraw
     :type db: Session
-    
+
     :param from_wallet_id: The wallet id of the wallet you want to withdraw from
     :type from_wallet_id: int
-    
+
     :param withdraw: schemas.WalletWithdraw
     :type withdraw: schemas.WalletWithdraw
-    
+
     :return: The to_wallet is being returned.
     """
 
     from_wallet = get_single_wallet(db, withdraw.user, from_wallet_id)
     to_wallet = get_single_wallet(db, withdraw.user, withdraw.id)
+
+    from_wallet.amount -= withdraw.amount
+    to_wallet.amount += withdraw.amount
+
+    db.commit()
+    db.refresh(from_wallet)
+    db.refresh(to_wallet)
+
+    return to_wallet
+
+
+def withdraw_from_to_user_wallet_transfer(
+    db: Session, user_id: int, wallet_to: int, withdraw: schemas.WalletWithdraw
+):
+    """
+    This function is responsible for transferring x amount from wallet y to user z wallet.
+
+    :param db: Session, from_wallet_id: int, withdraw: schemas.WalletWithdraw
+    :type db: Session
+
+    :param from_wallet_id: The wallet id of the wallet you want to withdraw from
+    :type from_wallet_id: int
+
+    :param withdraw: schemas.WalletWithdraw
+    :type withdraw: schemas.WalletWithdraw
+
+    :return: The to_wallet is being returned.
+    """
+
+    from_wallet = get_single_wallet(db, withdraw.user, withdraw.id)
+    to_wallet = get_single_wallet(db, user_id, wallet_to)
 
     from_wallet.amount -= withdraw.amount
     to_wallet.amount += withdraw.amount
