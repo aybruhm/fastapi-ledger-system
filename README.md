@@ -8,9 +8,9 @@ Design a system called a ledger system which means there is a user and each user
 
 - [x] ( Deposit Money ) Credit X amount to one of the user’s account
 - [x] ( Withdraw Money ) Debit X amount from one of the user’s account
-- [] Transfer money from one account to another account for a single user
-- [] Transfer money from one account of one user to another user
-- [] Get balance for a user
-- [] Get balance for an account of a user
+- [x] Transfer money from one account to another account for a single user
+- [x] Transfer money from one account of one user to another user
+- [x] Get balance for a user
+- [x] Get balance for an account of a user
 
 ## Getting Started
