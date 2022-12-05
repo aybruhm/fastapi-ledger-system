@@ -79,10 +79,15 @@ async def withdraw_money(
 
 
 @app.post(
-    "/transfer/wallet-to-wallet/{wallet_from_id}/{wallet_to_id}/", tags=["Ledger"]
+    "/transfer/wallet-to-wallet/{wallet_from_id}/", tags=["Ledger"]
 )
-async def wallet_to_wallet_transfer(wallet_from_id: int, wallet_to_id: int) -> dict:
-    return {}
+async def wallet_to_wallet_transfer(
+    wallet_from_id: int, withdraw: schemas.WalletWithdraw, db: Session = Depends(get_db)
+) -> dict:
+    services.withdraw_from_to_wallet_transfer(db, wallet_from_id, withdraw)
+    return {
+        "message": f"{withdraw.amount} was transfered from {wallet_from_id} wallet to {withdraw.id} wallet!"
+    }
 
 
 @app.post("/transfer/wallet-to-user/{wallet_id}/{user_id}", tags=["Ledger"])
