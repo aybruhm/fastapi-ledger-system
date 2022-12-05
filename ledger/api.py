@@ -78,7 +78,7 @@ async def withdraw_money(
     return {"message": f"NGN{withdraw.amount} withdrawn successful!"}
 
 
-@app.post("/transfer/wallet-to-wallet/{wallet_from_id}/", tags=["Ledger"])
+@app.post("/transfer/wallet-to-wallet/", tags=["Ledger"])
 async def wallet_to_wallet_transfer(
     wallet_from_id: int, withdraw: schemas.WalletWithdraw, db: Session = Depends(get_db)
 ) -> dict:
@@ -88,7 +88,7 @@ async def wallet_to_wallet_transfer(
     }
 
 
-@app.post("/transfer/wallet-to-user/{user_id}/{wallet_to_id}/", tags=["Ledger"])
+@app.post("/transfer/wallet-to-user/", tags=["Ledger"])
 async def wallet_to_user_transfer(
     user_id: int,
     wallet_to_id: int,
@@ -102,10 +102,14 @@ async def wallet_to_user_transfer(
 
 
 @app.get("/balance/", tags=["Ledger"])
-async def total_wallet_balance() -> dict:
-    return {}
+async def total_wallet_balance(
+    skip: int = 0, limit: int = 100, user_id: int = None, db: Session = Depends(get_db)
+) -> dict:
+    balance = services.get_total_wallet_balance(db, skip, limit, user_id)
+    return {"message": f"Total wallet balance is NGN{balance}"}
 
 
-@app.get("/balance/wallet/{wallet_id}/", tags=["Ledger"])
-async def wallet_balance(wallet_id: int) -> dict:
-    return {}
+@app.get("/balance/wallet/", tags=["Ledger"])
+async def wallet_balance(user_id: int, wallet_id: int) -> dict:
+    wallet = services.get_total_wallet_balance()
+    return {"message": f""}
