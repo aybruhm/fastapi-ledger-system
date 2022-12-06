@@ -79,6 +79,9 @@ class AuthHandler:
             token, self.JWT_SECRET, algorithms=self.JWT_ALGORITHM
         )
 
-        if decoded_token["expires"] >= datetime.now():
+        if (
+            datetime.strptime(decoded_token["expires"], "%Y-%m-%d %H:%M:%S.%f")
+            >= datetime.now()
+        ):
             return decoded_token
         return {"message": "Token invalid."}
