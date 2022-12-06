@@ -1,3 +1,6 @@
+# Stdlib Imports
+import json
+
 # FastAPI Imports
 from fastapi import FastAPI, Depends, HTTPException
 
@@ -7,7 +10,13 @@ from sqlalchemy.orm import Session
 # Own Imports
 from ledger import models, schemas, services
 from ledger.constants import get_db
-from config import database
+
+# Auth (Own) Imports
+from auth.auth_handler import AuthHandler
+from auth.schemas import UserLoginSchema
+
+# Config (Own) Imports
+from config import database, hashers
 
 
 app = FastAPI(
@@ -15,6 +24,10 @@ app = FastAPI(
     description="A fintech backend ledger system built with FastAPI.",
     version=1.0,
 )
+authentication = AuthHandler()
+pwd_hasher = hashers.PasswordHasher()
+
+
 models.Base.metadata.create_all(bind=database.DB_ENGINE)
 
 
@@ -36,6 +49,20 @@ async def create_new_user(user: schemas.UserCreate, db: Session = Depends(get_db
     if db_user:
         raise HTTPException(400, {"message": "User already exists!"})
     return services.create_user(db, user=user)
+
+
+@app.post("/login/", tags=["Auth"])
+async def login_user(user: UserLoginSchema, db: Session = Depends(get_db)):
+    db_user = services.get_user_by_email(db, user.email)
+
+    if db_user:
+        user_token = authentication.sign_jwt(db_user.id)
+
+        if pwd_hasher.check_password(user.password, db_user.password):
+            return user_token
+
+        raise HTTPException(401, {"message": "Password incorrect!"})
+    raise HTTPException(400, {"message": "User does not exist!"})
 
 
 @app.get("/users/", response_model=list[schemas.User], tags=["Users"])
@@ -110,6 +137,8 @@ async def total_wallet_balance(
 
 
 @app.get("/balance/wallet/", tags=["Ledger"])
-async def wallet_balance(user_id: int, wallet_id: int, db: Session = Depends(get_db)) -> dict:
+async def wallet_balance(
+    user_id: int, wallet_id: int, db: Session = Depends(get_db)
+) -> dict:
     balance = services.get_wallet_balance(db, user_id, wallet_id)
     return {"message": f"Wallet balance is NGN{balance}"}
