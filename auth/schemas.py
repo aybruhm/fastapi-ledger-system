@@ -9,7 +9,7 @@ class UserLoginSchema(BaseModel):
     class Config:
         schema_extra = {
             "example": {
-                "email": "abram@pandaware.tech",
+                "email": "your.name@email.com",
                 "password": "fastapi_is_awesome!",
             }
         }
