@@ -11,6 +11,8 @@ authentication = AuthHandler()
 
 
 class JWTBearer(HTTPBearer):
+    """Responsible for persisting authentication on our API routes."""
+
     def __init__(self, auto_error: bool = True):
         """
         The method __init__() is a constructor of the class JWTBearer
