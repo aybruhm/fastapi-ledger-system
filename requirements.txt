@@ -1,3 +1,5 @@
 fastapi==0.88.0
 uvicorn==0.20.0
 sqlalchemy==1.4.44
+pyjwt==2.6.0
+python-decouple==3.6
