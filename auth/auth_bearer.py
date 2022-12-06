@@ -42,7 +42,7 @@ class JWTBearer(HTTPBearer):
             if not credentials.scheme == "Bearer":
                 raise HTTPException(403, {"message": "Invalid authentication scheme."})
 
-            if not self.verify_jwt(credentials.credentials):
+            if not self.verify_jwt_token(credentials.credentials):
                 raise HTTPException(403, {"message": "Invalid token or expired token."})
 
             return credentials.credentials
