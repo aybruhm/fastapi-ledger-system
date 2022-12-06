@@ -1,6 +1,7 @@
 # Stdlib Imports
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, Any
+import json
 
 # PyJWT Imports
 import jwt
@@ -28,7 +29,7 @@ class AuthHandler:
         self,
         secret: str = JWT_SECRET,
         algorithm: str = JWT_ALGORITHM,
-        token_lifetime: int = JWT_ALGORITHM,
+        token_lifetime: Any = TOKEN_LIFETIME,
     ):
         """
         This method initializes the class with the secret, algorithm, and token lifetime.
@@ -44,7 +45,7 @@ class AuthHandler:
         """
         self.JWT_SECRET = secret
         self.JWT_ALGORITHM = algorithm
-        self.TOKEN_LIFETIME = token_lifetime
+        self.TOKEN_LIFETIME = int(token_lifetime)
 
     def sign_jwt(self, user_id: int) -> Dict[str, Any]:
         """
@@ -56,7 +57,10 @@ class AuthHandler:
 
         :return: A dictionary with the token and the expiration time.
         """
-        payload = {"user_id": user_id, "expires": datetime.now() + self.TOKEN_LIFETIME}
+        payload = {
+            "user_id": user_id,
+            "expires": str(datetime.now() + timedelta(minutes=self.TOKEN_LIFETIME)),
+        }
         token = jwt.encode(payload, self.JWT_SECRET, algorithm=self.JWT_ALGORITHM)
         return {"access_token": token}
 
