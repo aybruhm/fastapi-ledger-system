@@ -1,7 +1,9 @@
 # Stdlib Imports
 from datetime import datetime, timedelta
-from typing import Dict, Any
-import json
+from typing import Dict, Any, Union
+
+# FastAPI Imports
+from fastapi import HTTPException
 
 # PyJWT Imports
 import jwt
@@ -18,11 +20,10 @@ TOKEN_LIFETIME = config("TOKEN_LIFETIME")
 
 class AuthHandler:
     """
-    The auth handler will be responsible for:
+    Responsible for:
 
     - signing,
-    - encoding;
-    - decoding of tokens
+    - encoding/decoding of tokens
     """
 
     def __init__(
@@ -32,7 +33,8 @@ class AuthHandler:
         token_lifetime: Any = TOKEN_LIFETIME,
     ):
         """
-        This method initializes the class with the secret, algorithm, and token lifetime.
+        This method initializes the class with the secret, 
+        algorithm, and token lifetime.
 
         :param secret: The secret key used to sign the JWT
         :type secret: str
@@ -64,7 +66,7 @@ class AuthHandler:
         token = jwt.encode(payload, self.JWT_SECRET, algorithm=self.JWT_ALGORITHM)
         return {"access_token": token}
 
-    def decode_jwt(self, token: str) -> Dict:
+    def decode_jwt(self, token: str) -> Union[Dict, Exception]:
         """
         This method checks if the token is valid,
         return the decoded token, otherwise return an empty dictionary.
@@ -84,4 +86,4 @@ class AuthHandler:
             >= datetime.now()
         ):
             return decoded_token
-        return {"message": "Token invalid."}
+        raise HTTPException(403, {"message": "Token invalid."})
