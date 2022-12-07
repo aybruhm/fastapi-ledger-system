@@ -58,10 +58,8 @@ class JWTBearer(HTTPBearer):
 
         :return: A boolean value.
         """
-        is_token_valid: bool = False
         payload = authentication.decode_jwt(token)
 
         if payload:
-            is_token_valid = True
-            return is_token_valid
-        return is_token_valid
+            return True
+        return False
