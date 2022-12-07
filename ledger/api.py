@@ -5,8 +5,22 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from auth import hashers
 
-# Own Imports
-from ledger import services
+# Services Imports
+from ledger.services import (
+    create_wallet,
+    get_all_wallets,
+    get_all_wallets_by_user,
+    get_single_wallet,
+    deposit_money_to_wallet,
+    get_total_wallet_balance,
+    get_wallet_balance,
+    withdraw_from_to_user_wallet_transfer,
+    withdraw_from_to_wallet_transfer,
+    withdraw_money_from_wallet,
+)
+from users.services import create_user, get_user, get_user_by_email, get_users
+
+# Core Imports
 from core.constants import get_db
 
 # Auth (Own) Imports
@@ -38,19 +52,19 @@ router = APIRouter(dependencies=[Depends(jwt_bearer)])
     response_model=Wallet,
 )
 def create_wallet(wallet: WalletCreate, db: Session = Depends(get_db)):
-    db_wallet = services.create_wallet(db, wallet)
+    db_wallet = create_wallet(db, wallet)
     return db_wallet
 
 
 @router.get("/wallets/", response_model=list[Wallet])
 def get_wallets(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    db_wallets = services.get_all_wallets(db, skip, limit)
+    db_wallets = get_all_wallets(db, skip, limit)
     return db_wallets
 
 
 @router.post("/deposit/", dependencies=[Depends(jwt_bearer)])
 async def deposit_money(deposit: WalletDeposit, db: Session = Depends(get_db)) -> dict:
-    services.deposit_money_to_wallet(db, deposit)
+    deposit_money_to_wallet(db, deposit)
     return {"message": f"NGN{deposit.amount} deposit successful!"}
 
 
@@ -58,7 +72,7 @@ async def deposit_money(deposit: WalletDeposit, db: Session = Depends(get_db)) -
 async def withdraw_money(
     withdraw: WalletWithdraw, db: Session = Depends(get_db)
 ) -> dict:
-    services.withdraw_money_from_wallet(db, withdraw)
+    withdraw_money_from_wallet(db, withdraw)
     return {"message": f"NGN{withdraw.amount} withdrawn successful!"}
 
 
@@ -66,7 +80,7 @@ async def withdraw_money(
 async def wallet_to_wallet_transfer(
     wallet_from_id: int, withdraw: WalletWithdraw, db: Session = Depends(get_db)
 ) -> dict:
-    services.withdraw_from_to_wallet_transfer(db, wallet_from_id, withdraw)
+    withdraw_from_to_wallet_transfer(db, wallet_from_id, withdraw)
     return {
         "message": f"NGN{withdraw.amount} was transfered from W#{wallet_from_id} wallet to W#{withdraw.id} wallet!"
     }
@@ -79,7 +93,7 @@ async def wallet_to_user_transfer(
     withdraw: WalletWithdraw,
     db: Session = Depends(get_db),
 ) -> dict:
-    services.withdraw_from_to_user_wallet_transfer(db, user_id, wallet_to_id, withdraw)
+    withdraw_from_to_user_wallet_transfer(db, user_id, wallet_to_id, withdraw)
     return {
         "message": f"Transferred NGN{withdraw.amount} to W#{wallet_to_id} U#{user_id} wallet."
     }
@@ -89,7 +103,7 @@ async def wallet_to_user_transfer(
 async def total_wallet_balance(
     skip: int = 0, limit: int = 100, user_id: int = None, db: Session = Depends(get_db)
 ) -> dict:
-    balance = services.get_total_wallet_balance(db, skip, limit, user_id)
+    balance = get_total_wallet_balance(db, skip, limit, user_id)
     return {"message": f"Total wallet balance is NGN{balance}"}
 
 
@@ -97,5 +111,5 @@ async def total_wallet_balance(
 async def wallet_balance(
     user_id: int, wallet_id: int, db: Session = Depends(get_db)
 ) -> dict:
-    balance = services.get_wallet_balance(db, user_id, wallet_id)
+    balance = get_wallet_balance(db, user_id, wallet_id)
     return {"message": f"Wallet balance is NGN{balance}"}
