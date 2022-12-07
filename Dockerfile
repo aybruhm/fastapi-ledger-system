@@ -1,8 +1,19 @@
+# pull from tiangolo image
 FROM tiangolo/uvicorn-gunicorn:python3.9-slim
 
+# set working directory
 WORKDIR /ledger_be
 
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-COPY . .
+# copy requirements file
+COPY requirements.txt .
+
+# install dependencies
+RUN pip install --upgrade pip setuptools wheel \
+    && pip install -r /ledger_be/requirements.txt \
+    && rm -rf /root/.cache/pip
+
+COPY . /ledger_be/
