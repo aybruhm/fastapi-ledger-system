@@ -4,9 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException
 # SQLAlchemy Imports
 from sqlalchemy.orm import Session
 
-# Own Imports
-from ledger import services
+# Core Imports
 from core.constants import get_db
+
+# Services Imports
+from users.services import get_user_by_email, create_user
 
 # Auth Imports
 from auth.auth_handler import AuthHandler
@@ -26,16 +28,16 @@ pwd_hasher = PasswordHasher()
 
 @router.post("/users/", response_model=User)
 async def create_new_user(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = services.get_user_by_email(db, user.email)
+    db_user = get_user_by_email(db, user.email)
 
     if db_user:
         raise HTTPException(400, {"message": "User already exists!"})
-    return services.create_user(db, user=user)
+    return create_user(db, user=user)
 
 
-@router.post("/login/", tags=["Auth"])
+@router.post("/login/")
 async def login_user(user: UserLoginSchema, db: Session = Depends(get_db)):
-    db_user = services.get_user_by_email(db, user.email)
+    db_user = get_user_by_email(db, user.email)
 
     if db_user:
         user_token = auth_handler.sign_jwt(db_user.id)
