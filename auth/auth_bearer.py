@@ -34,18 +34,18 @@ class JWTBearer(HTTPBearer):
 
         :return: The token
         """
-        credentials: HTTPAuthorizationCredentials = await super(
+        authorization_credentials: HTTPAuthorizationCredentials = await super(
             JWTBearer, self
         ).__call__(request)
 
-        if credentials:
-            if not credentials.scheme == "Bearer":
+        if authorization_credentials:
+            if not authorization_credentials.scheme == "Bearer":
                 raise HTTPException(403, {"message": "Invalid authentication scheme."})
 
-            if not self.verify_jwt_token(credentials.credentials):
+            if not self.verify_jwt_token(authorization_credentials.credentials):
                 raise HTTPException(403, {"message": "Invalid token or expired token."})
 
-            return credentials.credentials
+            return authorization_credentials.credentials
         else:
             raise HTTPException(403, {"message": "Invalid authorization code."})
 
