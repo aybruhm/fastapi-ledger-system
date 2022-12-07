@@ -6,6 +6,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
+# Third Party Imports
+from databases import Database
+
 
 # SQLALCHEMY_DATABASE_URL = "sqlite:///./ledger.sqlite"
 SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
@@ -20,3 +23,6 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=DB_ENGINE)
 
 # Construct a base class for declarative class definitions.
 Base = declarative_base()
+
+# Construct a db connector to connect, shutdown database
+db_connect = Database(SQLALCHEMY_DATABASE_URL)
