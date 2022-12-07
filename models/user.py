@@ -5,10 +5,11 @@ import datetime
 from sqlalchemy import Boolean, Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 
-# Own Imports
+# Config Imports
 from config.database import Base
 
-
+# Wallet Imports
+from models.ledger import Wallet
 
 
 class User(Base):
@@ -22,4 +23,4 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.datetime.now)
     updated_at = Column(DateTime, onupdate=datetime.datetime.now)
 
-    wallets = relationship("Wallet", back_populates="owner")
+    wallets = relationship(Wallet, back_populates="owner")

@@ -5,7 +5,7 @@ import datetime
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 
-# Own Imports
+# Core Imports
 from config.database import Base
 
 
