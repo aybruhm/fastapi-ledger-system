@@ -28,10 +28,7 @@ async def users_info(skip: int = 0, limit: int = 100, db: Session = Depends(get_
     return db_users
 
 
-@router.get(
-    "/users/me/",
-    response_model=User,
-)
+@router.get("/users/me/", response_model=User)
 async def user_info(user_id: int, db: Session = Depends(get_db)):
     db_user = get_user(db, user_id)
     return db_user

@@ -19,7 +19,7 @@ from ledger.services import (
 # Core Imports
 from core.constants import get_db
 
-# Auth (Own) Imports
+# Auth Imports
 from auth.auth_handler import AuthHandler
 from auth.auth_bearer import JWTBearer
 from auth.hashers import PasswordHasher
