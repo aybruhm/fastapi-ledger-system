@@ -23,6 +23,7 @@ app = FastAPI(
     version=1.0,
 )
 authentication = AuthHandler()
+jwt_bearer = JWTBearer()
 pwd_hasher = hashers.PasswordHasher()
 
 
@@ -71,7 +72,7 @@ async def users_info(skip: int = 0, limit: int = 100, db: Session = Depends(get_
 
 @app.get(
     "/users/{user_id}/",
-    dependencies=[Depends(JWTBearer())],
+    dependencies=[Depends(jwt_bearer)],
     response_model=schemas.User,
     tags=["Users"],
 )
@@ -82,7 +83,7 @@ async def user_info(user_id: int, db: Session = Depends(get_db)):
 
 @app.post(
     "/wallets/",
-    dependencies=[Depends(JWTBearer())],
+    dependencies=[Depends(jwt_bearer)],
     response_model=schemas.Wallet,
     tags=["Ledger"],
 )
@@ -97,7 +98,7 @@ def get_wallets(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return db_wallets
 
 
-@app.post("/deposit/", dependencies=[Depends(JWTBearer())], tags=["Ledger"])
+@app.post("/deposit/", dependencies=[Depends(jwt_bearer)], tags=["Ledger"])
 async def deposit_money(
     deposit: schemas.WalletDeposit, db: Session = Depends(get_db)
 ) -> dict:
@@ -105,7 +106,7 @@ async def deposit_money(
     return {"message": f"NGN{deposit.amount} deposit successful!"}
 
 
-@app.post("/withdraw/", dependencies=[Depends(JWTBearer())], tags=["Ledger"])
+@app.post("/withdraw/", dependencies=[Depends(jwt_bearer)], tags=["Ledger"])
 async def withdraw_money(
     withdraw: schemas.WalletWithdraw, db: Session = Depends(get_db)
 ) -> dict:
@@ -114,7 +115,7 @@ async def withdraw_money(
 
 
 @app.post(
-    "/transfer/wallet-to-wallet/", dependencies=[Depends(JWTBearer())], tags=["Ledger"]
+    "/transfer/wallet-to-wallet/", dependencies=[Depends(jwt_bearer)], tags=["Ledger"]
 )
 async def wallet_to_wallet_transfer(
     wallet_from_id: int, withdraw: schemas.WalletWithdraw, db: Session = Depends(get_db)
@@ -126,7 +127,7 @@ async def wallet_to_wallet_transfer(
 
 
 @app.post(
-    "/transfer/wallet-to-user/", dependencies=[Depends(JWTBearer())], tags=["Ledger"]
+    "/transfer/wallet-to-user/", dependencies=[Depends(jwt_bearer)], tags=["Ledger"]
 )
 async def wallet_to_user_transfer(
     user_id: int,
@@ -140,7 +141,7 @@ async def wallet_to_user_transfer(
     }
 
 
-@app.get("/balance/", dependencies=[Depends(JWTBearer())], tags=["Ledger"])
+@app.get("/balance/", dependencies=[Depends(jwt_bearer)], tags=["Ledger"])
 async def total_wallet_balance(
     skip: int = 0, limit: int = 100, user_id: int = None, db: Session = Depends(get_db)
 ) -> dict:
@@ -148,7 +149,7 @@ async def total_wallet_balance(
     return {"message": f"Total wallet balance is NGN{balance}"}
 
 
-@app.get("/balance/wallet/", dependencies=[Depends(JWTBearer())], tags=["Ledger"])
+@app.get("/balance/wallet/", dependencies=[Depends(jwt_bearer)], tags=["Ledger"])
 async def wallet_balance(
     user_id: int, wallet_id: int, db: Session = Depends(get_db)
 ) -> dict:
