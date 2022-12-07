@@ -1,21 +1,18 @@
 # SQLAlchemy Imports
 from sqlalchemy.orm import Session, joinedload
 
-# Own Imports
-from ledger import schemas
-
 # Auth Imports
 from auth.hashers import PasswordHasher
 
 # Models Imports
-from schemas.user import User
+from schemas.user import User, UserCreate
 
 
 # Initialize password hasher
 pwd_hasher = PasswordHasher()
 
 
-def create_user(db: Session, user: schemas.UserCreate):
+def create_user(db: Session, user: UserCreate):
     """
     This function creates a new user in the database.
 
