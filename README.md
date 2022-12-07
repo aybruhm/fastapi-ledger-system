@@ -14,3 +14,27 @@ Design a system called a ledger system which means there is a user and each user
 - [x] Get balance for an account of a user
 
 ## Getting Started
+
+To get the service up and running, follow the steps below:
+
+1). Run the commands below in your terminal:
+
+```bash
+git clone git@github.com:aybruhm/fastapi-ledger-system.git
+```
+
+2). Change directory to fastapi-ledger-system:
+
+```bash
+cd fastapi-ledger-system
+```
+
+3). Rename the `.env.template` file to `.env` and update the values.
+
+4). Build and run the service with:
+
+```bash
+docker-compose up --build
+```
+
+The service will build and run on port `8080`.
