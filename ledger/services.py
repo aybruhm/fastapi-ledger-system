@@ -4,9 +4,12 @@ from sqlalchemy.orm import Session
 # FastAPI Imports
 from fastapi import HTTPException
 
+# Schemas Imports
+from schemas.ledger import WalletCreate, WalletWithdraw, WalletDeposit
+
 # Models Imports
-from schemas.user import User
-from schemas.ledger import Wallet, WalletCreate, WalletWithdraw, WalletDeposit
+from models.user import User
+from models.ledger import Wallet as UserWallet
 
 
 def create_wallet(db: Session, wallet: WalletCreate):
@@ -22,7 +25,7 @@ def create_wallet(db: Session, wallet: WalletCreate):
     :return: The wallet that was created.
     """
 
-    db_wallet = Wallet(title=wallet.title, user=wallet.user, amount=wallet.amount)
+    db_wallet = UserWallet(title=wallet.title, user=wallet.user, amount=wallet.amount)
 
     db.add(db_wallet)
     db.commit()
@@ -46,7 +49,7 @@ def get_all_wallets(db: Session, skip: int, limit: int):
 
     :return: A list of all the wallets in the database.
     """
-    return db.query(Wallet).offset(skip).limit(limit).all()
+    return db.query(UserWallet).offset(skip).limit(limit).all()
 
 
 def get_all_wallets_by_user(db: Session, skip: int, limit: int, user_id: int):
@@ -68,8 +71,8 @@ def get_all_wallets_by_user(db: Session, skip: int, limit: int, user_id: int):
     :return: A list of all wallets for a given user.
     """
     return (
-        db.query(Wallet)
-        .join(Wallet.owner)
+        db.query(UserWallet)
+        .join(UserWallet.owner)
         .filter(User.id == user_id)
         .offset(skip)
         .limit(limit)
@@ -93,10 +96,10 @@ def get_single_wallet(db: Session, user_id: int, wallet_id: int):
     :return: The wallet that matches the user_id and wallet_id
     """
     db_wallet = (
-        db.query(Wallet)
-        .join(Wallet.owner)
+        db.query(UserWallet)
+        .join(UserWallet.owner)
         .filter(User.id == user_id)
-        .filter(Wallet.id == wallet_id)
+        .filter(UserWallet.id == wallet_id)
         .first()
     )
 

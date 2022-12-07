@@ -4,8 +4,11 @@ from sqlalchemy.orm import Session, joinedload
 # Auth Imports
 from auth.hashers import PasswordHasher
 
+# Schemas Imports
+from schemas.user import UserCreate
+
 # Models Imports
-from schemas.user import User, UserCreate
+from models.user import User
 
 
 # Initialize password hasher
