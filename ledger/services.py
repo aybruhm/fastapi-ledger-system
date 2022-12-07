@@ -1,109 +1,15 @@
 # SQLAlchemy Imports
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session
 
 # FastAPI Imports
 from fastapi import HTTPException
 
-# Own Imports
-from ledger import schemas, models
-from config.hashers import PasswordHasher
+# Models Imports
+from schemas.user import User
+from schemas.ledger import Wallet, WalletCreate, WalletWithdraw, WalletDeposit
 
 
-# Initialize password hasher
-pwd_hasher = PasswordHasher()
-
-
-def create_user(db: Session, user: schemas.UserCreate):
-    """
-    This function creates a new user in the database.
-
-    :param db: Session
-    :type db: Session
-
-    :param user: schemas.UserCreate
-    :type user: schemas.UserCreate
-
-    :return: The user object
-    """
-
-    hashed_password = pwd_hasher.hash_password(user.password)
-    db_user = models.User(name=user.name, email=user.email, password=hashed_password)
-
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-
-    return db_user
-
-
-def get_user(db: Session, user_id: int):
-    """
-    This function gets a user from the database by ID.
-
-    :param db: Session
-    :type db: Session
-
-    :param user_id: The ID of the user to get
-    :type user_id: int
-
-    :return: The first user in the database with the id of user_id
-    """
-    return (
-        db.query(models.User)
-        .options(joinedload(models.User.wallets))
-        .filter(models.User.id == user_id)
-        .first()
-    )
-
-
-def get_users(db: Session, skip: int, limit: int):
-    """
-    This function gets all users from the database,
-    skipping the first `skip` users, and limiting
-    the result to `limit` users.
-
-    :param db: Session
-    :type db: Session
-
-    :param skip: The number of records to skip
-    :type skip: int
-
-    :param limit: The number of items to return
-    :type limit: int
-
-    :return: A list of users
-    """
-    return (
-        db.query(models.User)
-        .options(joinedload(models.User.wallets))
-        .offset(skip)
-        .limit(limit)
-        .all()
-    )
-
-
-def get_user_by_email(db: Session, user_email: str):
-    """
-    This function gets a user from the database by their email address.
-
-    :param db: Session
-    :type db: Session
-
-    :param user_email: The email address of the user you want to get
-    :type user_email: str
-
-    :return: The first user in the database with the email address that matches the user_email
-    parameter.
-    """
-    return (
-        db.query(models.User)
-        .options(joinedload(models.User.wallets))
-        .filter(models.User.email == user_email)
-        .first()
-    )
-
-
-def create_wallet(db: Session, wallet: schemas.WalletCreate):
+def create_wallet(db: Session, wallet: WalletCreate):
     """
     It creates a new wallet in the database.
 
@@ -116,9 +22,7 @@ def create_wallet(db: Session, wallet: schemas.WalletCreate):
     :return: The wallet that was created.
     """
 
-    db_wallet = models.Wallet(
-        title=wallet.title, user=wallet.user, amount=wallet.amount
-    )
+    db_wallet = Wallet(title=wallet.title, user=wallet.user, amount=wallet.amount)
 
     db.add(db_wallet)
     db.commit()
@@ -142,7 +46,7 @@ def get_all_wallets(db: Session, skip: int, limit: int):
 
     :return: A list of all the wallets in the database.
     """
-    return db.query(models.Wallet).offset(skip).limit(limit).all()
+    return db.query(Wallet).offset(skip).limit(limit).all()
 
 
 def get_all_wallets_by_user(db: Session, skip: int, limit: int, user_id: int):
@@ -164,9 +68,9 @@ def get_all_wallets_by_user(db: Session, skip: int, limit: int, user_id: int):
     :return: A list of all wallets for a given user.
     """
     return (
-        db.query(models.Wallet)
-        .join(models.Wallet.owner)
-        .filter(models.User.id == user_id)
+        db.query(Wallet)
+        .join(Wallet.owner)
+        .filter(User.id == user_id)
         .offset(skip)
         .limit(limit)
         .all()
@@ -189,10 +93,10 @@ def get_single_wallet(db: Session, user_id: int, wallet_id: int):
     :return: The wallet that matches the user_id and wallet_id
     """
     db_wallet = (
-        db.query(models.Wallet)
-        .join(models.Wallet.owner)
-        .filter(models.User.id == user_id)
-        .filter(models.Wallet.id == wallet_id)
+        db.query(Wallet)
+        .join(Wallet.owner)
+        .filter(User.id == user_id)
+        .filter(Wallet.id == wallet_id)
         .first()
     )
 
@@ -201,7 +105,7 @@ def get_single_wallet(db: Session, user_id: int, wallet_id: int):
     raise HTTPException(400, {"message": "Wallet does not exist!"})
 
 
-def deposit_money_to_wallet(db: Session, deposit: schemas.WalletDeposit):
+def deposit_money_to_wallet(db: Session, deposit: WalletDeposit):
     """
     This function takes a database session, a wallet deposit object, and returns a wallet object.
 
@@ -222,7 +126,7 @@ def deposit_money_to_wallet(db: Session, deposit: schemas.WalletDeposit):
     return topup_wallet
 
 
-def withdraw_money_from_wallet(db: Session, withdraw: schemas.WalletWithdraw):
+def withdraw_money_from_wallet(db: Session, withdraw: WalletWithdraw):
     """
     The function takes a database session and a `WalletWithdraw` object as input. It then gets the
     wallet to withdraw from, subtracts the amount to withdraw from the wallet's balance, and returns the
@@ -247,7 +151,7 @@ def withdraw_money_from_wallet(db: Session, withdraw: schemas.WalletWithdraw):
 
 
 def withdraw_from_to_wallet_transfer(
-    db: Session, from_wallet_id: int, withdraw: schemas.WalletWithdraw
+    db: Session, from_wallet_id: int, withdraw: WalletWithdraw
 ):
     """
     This function is responsible for transferring x amount from wallet y to wallet z.
@@ -278,7 +182,7 @@ def withdraw_from_to_wallet_transfer(
 
 
 def withdraw_from_to_user_wallet_transfer(
-    db: Session, user_id: int, wallet_to: int, withdraw: schemas.WalletWithdraw
+    db: Session, user_id: int, wallet_to: int, withdraw: WalletWithdraw
 ):
     """
     This function is responsible for transferring x amount from wallet y to user z wallet.
@@ -311,22 +215,22 @@ def withdraw_from_to_user_wallet_transfer(
 def get_total_wallet_balance(db: Session, skip: int, limit: int, user_id: int):
     """
     This function gets all wallets for a user, then sum up the amount of each wallet.
-    
+
     :param db: Session - this is the database session that we created in the previous step
     :type db: Session
-    
+
     :param skip: the number of records to skip
     :type skip: int
-    
+
     :param limit: The number of wallets to return
     :type limit: int
-    
+
     :param user_id: The user id of the user whose wallets you want to get
     :type user_id: int
-    
+
     :return: The total balance of all wallets for a user.
     """
-    
+
     wallets = get_all_wallets_by_user(db, skip, limit, user_id)
 
     total_balance = 0
@@ -338,19 +242,19 @@ def get_total_wallet_balance(db: Session, skip: int, limit: int, user_id: int):
 def get_wallet_balance(db: Session, user_id: int, wallet_id: int):
     """
     This function gets the balance of a single wallet.
-    
+
     :param db: Session - this is the database session that we created in the main.py file
     :type db: Session
-    
+
     :param user_id: The user_id of the user who owns the wallet
     :type user_id: int
-    
+
     :param wallet_id: The id of the wallet you want to get the balance of
     :type wallet_id: int
-    
+
     :return: The balance of the wallet
     """
-    
+
     wallet = get_single_wallet(db, user_id, wallet_id)
     balance = wallet.amount
     return balance
