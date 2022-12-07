@@ -3,14 +3,11 @@ from fastapi import APIRouter, Depends
 
 # SQLAlchemy Imports
 from sqlalchemy.orm import Session
-from auth import hashers
 
 # Services Imports
 from ledger.services import (
-    create_wallet,
+    create_wallet as create_user_wallet,
     get_all_wallets,
-    get_all_wallets_by_user,
-    get_single_wallet,
     deposit_money_to_wallet,
     get_total_wallet_balance,
     get_wallet_balance,
@@ -18,7 +15,6 @@ from ledger.services import (
     withdraw_from_to_wallet_transfer,
     withdraw_money_from_wallet,
 )
-from users.services import create_user, get_user, get_user_by_email, get_users
 
 # Core Imports
 from core.constants import get_db
@@ -26,49 +22,41 @@ from core.constants import get_db
 # Auth (Own) Imports
 from auth.auth_handler import AuthHandler
 from auth.auth_bearer import JWTBearer
+from auth.hashers import PasswordHasher
 
 # Schema Imports
 from schemas.ledger import Wallet, WalletCreate, WalletDeposit, WalletWithdraw
-
-# Config (Own) Imports
-from config import database
 
 
 # Initialize authentication, jwt_bearer and pwd_hasher
 authentication = AuthHandler()
 jwt_bearer = JWTBearer()
-pwd_hasher = hashers.PasswordHasher()
+pwd_hasher = PasswordHasher()
 
 
 # Initialze fastapi app
 router = APIRouter(dependencies=[Depends(jwt_bearer)])
 
 
-# models.Base.metadata.create_all(bind=database.DB_ENGINE)
-
-
-@router.post(
-    "/wallets/",
-    response_model=Wallet,
-)
-def create_wallet(wallet: WalletCreate, db: Session = Depends(get_db)):
-    db_wallet = create_wallet(db, wallet)
+@router.post("/wallets/", response_model=Wallet)
+async def create_wallet(wallet: WalletCreate, db: Session = Depends(get_db)):
+    db_wallet = create_user_wallet(db, wallet)
     return db_wallet
 
 
 @router.get("/wallets/", response_model=list[Wallet])
-def get_wallets(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+async def get_wallets(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     db_wallets = get_all_wallets(db, skip, limit)
     return db_wallets
 
 
-@router.post("/deposit/", dependencies=[Depends(jwt_bearer)])
+@router.post("/deposit/")
 async def deposit_money(deposit: WalletDeposit, db: Session = Depends(get_db)) -> dict:
     deposit_money_to_wallet(db, deposit)
     return {"message": f"NGN{deposit.amount} deposit successful!"}
 
 
-@router.post("/withdraw/", dependencies=[Depends(jwt_bearer)])
+@router.post("/withdraw/")
 async def withdraw_money(
     withdraw: WalletWithdraw, db: Session = Depends(get_db)
 ) -> dict:
@@ -76,7 +64,7 @@ async def withdraw_money(
     return {"message": f"NGN{withdraw.amount} withdrawn successful!"}
 
 
-@router.post("/transfer/wallet-to-wallet/", dependencies=[Depends(jwt_bearer)])
+@router.post("/transfer/wallet-to-wallet/")
 async def wallet_to_wallet_transfer(
     wallet_from_id: int, withdraw: WalletWithdraw, db: Session = Depends(get_db)
 ) -> dict:
@@ -86,7 +74,7 @@ async def wallet_to_wallet_transfer(
     }
 
 
-@router.post("/transfer/wallet-to-user/", dependencies=[Depends(jwt_bearer)])
+@router.post("/transfer/wallet-to-user/")
 async def wallet_to_user_transfer(
     user_id: int,
     wallet_to_id: int,
@@ -99,7 +87,7 @@ async def wallet_to_user_transfer(
     }
 
 
-@router.get("/balance/", dependencies=[Depends(jwt_bearer)])
+@router.get("/balance/")
 async def total_wallet_balance(
     skip: int = 0, limit: int = 100, user_id: int = None, db: Session = Depends(get_db)
 ) -> dict:
@@ -107,7 +95,7 @@ async def total_wallet_balance(
     return {"message": f"Total wallet balance is NGN{balance}"}
 
 
-@router.get("/balance/wallet/", dependencies=[Depends(jwt_bearer)])
+@router.get("/balance/wallet/")
 async def wallet_balance(
     user_id: int, wallet_id: int, db: Session = Depends(get_db)
 ) -> dict:
