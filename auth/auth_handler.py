@@ -91,3 +91,6 @@ class AuthHandler:
         ):
             return decoded_token
         raise HTTPException(403, {"message": "Token invalid."})
+
+
+authentication = AuthHandler()

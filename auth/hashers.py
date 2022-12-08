@@ -36,3 +36,6 @@ class PasswordHasher:
         :return bool: The password context is being returned.
         """
         return self.password_context.verify(password, hashed_password)
+
+
+pwd_hasher = PasswordHasher()

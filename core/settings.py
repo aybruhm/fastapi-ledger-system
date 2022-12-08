@@ -6,6 +6,8 @@ from decouple import config
 
 
 class Settings(BaseSettings):
+    """Base configuration settings"""
+
     JWT_SECRET_KEY: str = config("JWT_SECRET")
     JWT_ALGORITHM: str = config("JWT_ALGORITHM")
     TOKEN_LIFETIME: int = 30

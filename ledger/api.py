@@ -4,11 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException
 # SQLAlchemy Imports
 from sqlalchemy.orm import Session
 
-
 # Auth Imports
-from auth.auth_bearer import JWTBearer
-from auth.hashers import PasswordHasher
-from auth.auth_handler import AuthHandler
+from auth.auth_bearer import jwt_bearer
 
 # Core Imports
 from core.constants import get_db, get_current_user
@@ -32,12 +29,6 @@ from ledger.services import (
 from schemas.ledger import Wallet, WalletCreate, WalletDeposit, WalletWithdraw
 
 
-# Initialize authentication, jwt_bearer and pwd_hasher
-authentication = AuthHandler()
-jwt_bearer = JWTBearer()
-pwd_hasher = PasswordHasher()
-
-
 # Initialze fastapi app
 router = APIRouter(dependencies=[Depends(jwt_bearer)])
 
@@ -52,7 +43,7 @@ async def create_wallet(
         raise HTTPException(
             401, {"message": "Unauthorized to perform this action!"}
         )
-        
+
     db_wallet = create_user_wallet(db, wallet)
     return db_wallet
 
@@ -64,11 +55,11 @@ async def get_wallets(
     db: Session = Depends(get_db),
     current_user: UserModel = Depends(get_current_user),
 ):
-    
+
     if current_user:
         db_wallets = get_all_wallets_by_user(db, skip, limit, current_user.id)
         return db_wallets
-    
+
     raise HTTPException(
         401, {"message": "Unauthorized to perform this action!"}
     )
@@ -85,7 +76,7 @@ async def deposit_money(
         raise HTTPException(
             401, {"message": "Unauthorized to perform this action!"}
         )
-        
+
     deposit_money_to_wallet(db, deposit)
     return {"message": f"NGN{deposit.amount} deposit successful!"}
 
@@ -96,12 +87,12 @@ async def withdraw_money(
     db: Session = Depends(get_db),
     current_user: UserModel = Depends(get_current_user),
 ) -> dict:
-    
+
     if current_user.id != withdraw.user:
         raise HTTPException(
             401, {"message": "Unauthorized to perform this action!"}
         )
-        
+
     withdraw_money_from_wallet(db, withdraw)
     return {"message": f"NGN{withdraw.amount} withdrawn successful!"}
 
@@ -113,12 +104,12 @@ async def wallet_to_wallet_transfer(
     db: Session = Depends(get_db),
     current_user: UserModel = Depends(get_current_user),
 ) -> dict:
-    
+
     if current_user.id != withdraw.user:
         raise HTTPException(
             401, {"message": "Unauthorized to perform this action!"}
         )
-        
+
     withdraw_from_to_wallet_transfer(db, wallet_from_id, withdraw)
     return {
         "message": f"NGN{withdraw.amount} was transfered from W#{wallet_from_id} wallet to W#{withdraw.id} wallet!"
@@ -133,12 +124,12 @@ async def wallet_to_user_transfer(
     db: Session = Depends(get_db),
     current_user: UserModel = Depends(get_current_user),
 ) -> dict:
-    
+
     if current_user.id != withdraw.user:
         raise HTTPException(
             401, {"message": "Unauthorized to perform this action!"}
         )
-        
+
     withdraw_from_to_user_wallet_transfer(db, user_id, wallet_to_id, withdraw)
     return {
         "message": f"Transferred NGN{withdraw.amount} to W#{wallet_to_id} U#{user_id} wallet."
@@ -158,7 +149,7 @@ async def total_wallet_balance(
         raise HTTPException(
             401, {"message": "Unauthorized to perform this action!"}
         )
-        
+
     balance = get_total_wallet_balance(db, skip, limit, user_id)
     return {"message": f"Total wallet balance is NGN{balance}"}
 
@@ -170,11 +161,11 @@ async def wallet_balance(
     db: Session = Depends(get_db),
     current_user: UserModel = Depends(get_current_user),
 ) -> dict:
-    
+
     if current_user.id != user_id:
         raise HTTPException(
             401, {"message": "Unauthorized to perform this action!"}
         )
-        
+
     balance = get_wallet_balance(db, user_id, wallet_id)
     return {"message": f"Wallet balance is NGN{balance}"}

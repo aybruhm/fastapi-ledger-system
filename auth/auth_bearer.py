@@ -3,11 +3,7 @@ from fastapi import Request, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 # Own Imports
-from auth.auth_handler import AuthHandler
-
-
-# Initialize auth handler
-authentication = AuthHandler()
+from auth.auth_handler import authentication
 
 
 class JWTBearer(HTTPBearer):
@@ -63,3 +59,6 @@ class JWTBearer(HTTPBearer):
         if payload:
             return True
         return False
+
+
+jwt_bearer = JWTBearer()
