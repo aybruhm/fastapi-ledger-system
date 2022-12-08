@@ -1,7 +1,3 @@
-# 3rd Party Imports
-import jwt
-from decouple import config
-
 # FastAPI Imports
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -10,6 +6,10 @@ from sqlalchemy.orm import Session
 from auth.auth_bearer import JWTBearer
 from config.database import SessionLocal
 from users import services
+
+# 3rd Party Imports
+import jwt
+from decouple import config
 
 
 def get_db():
@@ -42,7 +42,7 @@ def get_current_user(
         )
     except (jwt.PyJWTError, Exception):
         raise HTTPException(403, {"message": "Could not validate token."})
-    
+
     user = services.get_user(db, payload["user_id"])
     if not user:
         raise HTTPException(404, {"message": "User does not exist!"})
