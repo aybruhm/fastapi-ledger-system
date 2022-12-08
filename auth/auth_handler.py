@@ -9,13 +9,13 @@ from fastapi import HTTPException
 import jwt
 
 # Third Party Imports
-from decouple import config
+from core.settings import ledger_settings
 
 
 # JWT Env Definitions
-JWT_SECRET = config("JWT_SECRET")
-JWT_ALGORITHM = config("JWT_ALGORITHM")
-TOKEN_LIFETIME = config("TOKEN_LIFETIME")
+JWT_SECRET = ledger_settings.JWT_SECRET_KEY
+JWT_ALGORITHM = ledger_settings.JWT_ALGORITHM
+TOKEN_LIFETIME = ledger_settings.TOKEN_LIFETIME
 
 
 class AuthHandler:
@@ -30,10 +30,10 @@ class AuthHandler:
         self,
         secret: str = JWT_SECRET,
         algorithm: str = JWT_ALGORITHM,
-        token_lifetime: Any = TOKEN_LIFETIME,
+        token_lifetime: int = TOKEN_LIFETIME,
     ):
         """
-        This method initializes the class with the secret, 
+        This method initializes the class with the secret,
         algorithm, and token lifetime.
 
         :param secret: The secret key used to sign the JWT
@@ -47,7 +47,7 @@ class AuthHandler:
         """
         self.JWT_SECRET = secret
         self.JWT_ALGORITHM = algorithm
-        self.TOKEN_LIFETIME = int(token_lifetime)
+        self.TOKEN_LIFETIME = token_lifetime
 
     def sign_jwt(self, user_id: int) -> Dict[str, Any]:
         """
@@ -61,9 +61,13 @@ class AuthHandler:
         """
         payload = {
             "user_id": user_id,
-            "expires": str(datetime.now() + timedelta(minutes=self.TOKEN_LIFETIME)),
+            "expires": str(
+                datetime.now() + timedelta(minutes=self.TOKEN_LIFETIME)
+            ),
         }
-        token = jwt.encode(payload, self.JWT_SECRET, algorithm=self.JWT_ALGORITHM)
+        token = jwt.encode(
+            payload, self.JWT_SECRET, algorithm=self.JWT_ALGORITHM
+        )
         return {"access_token": token}
 
     def decode_jwt(self, token: str) -> Union[Dict, Exception]:
