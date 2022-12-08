@@ -43,7 +43,7 @@ class WalletCreate(WalletBase):
         )
 
         if user_wallet_counts == 10:
-            raise HTTPException(400, {"message": "Can only have ten wallet."})
+            raise HTTPException(400, {"message": "User can only have ten wallet!"})
         return value
 
 

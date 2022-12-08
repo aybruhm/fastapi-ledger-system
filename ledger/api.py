@@ -31,6 +31,7 @@ from ledger.services import (
 # Schema Imports
 from schemas.ledger import Wallet, WalletCreate, WalletDeposit, WalletWithdraw
 
+
 # Initialize authentication, jwt_bearer and pwd_hasher
 authentication = AuthHandler()
 jwt_bearer = JWTBearer()
