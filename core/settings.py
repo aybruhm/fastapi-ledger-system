@@ -11,12 +11,19 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str = config("JWT_SECRET")
     JWT_ALGORITHM: str = config("JWT_ALGORITHM")
     TOKEN_LIFETIME: int = 30
-    
-    TITLE = "Ledger System"
-    DESCRIPTION = "A fintech backend ledger system built with FastAPI."
-    CONTACT = "israelvictory87@gmail.com"
-    API_VERSION = 1.0
-    LICENSE = "CC0 1.0 Universal"
+
+    TITLE: str = "Ledger System"
+    DESCRIPTION: str = "A fintech backend ledger system built with FastAPI."
+    CONTACT: dict = {
+        "name": "Abraham Israel",
+        "url": "http://linkedin.com/in/abraham-israel",
+        "email": "israelvictory87@gmail.com",
+    }
+    API_VERSION: float = 1.0
+    LICENSE: dict = {
+        "name": "CC0 1.0 Universal",
+        "url": "https://github.com/aybruhm/fastapi-ledger-system/blob/main/LICENSE",
+    }
 
 
 ledger_settings = Settings()
