@@ -1,23 +1,26 @@
 # Uvicorn Imports
 import uvicorn
 
+# FastAPI Imports
+from fastapi import FastAPI
+
 # Own Imports
 from config.database import db_connect
+from core.settings import ledger_settings
 
 # Routers Imports
 from users.api import router as api_router
 from users.auth import router as auth_router
 from ledger.api import router as ledger_router
 
-# FastAPI Imports
-from fastapi import FastAPI
-
 
 # Initialize fastapi
 app = FastAPI(
-    title="Ledger System",
-    description="A fintech backend ledger system built with FastAPI.",
-    version=1.0,
+    title=ledger_settings.TITLE,
+    description=ledger_settings.DESCRIPTION,
+    version=ledger_settings.API_VERSION,
+    contact=ledger_settings.CONTACT,
+    license_info=ledger_settings.LICENSE
 )
 
 # Include routers to base router
