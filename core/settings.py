@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     TITLE = "Ledger System"
     DESCRIPTION = "A fintech backend ledger system built with FastAPI."
     CONTACT = "israelvictory87@gmail.com"
+    API_VERSION = 1.0
     LICENSE = "CC0 1.0 Universal"
 
 
