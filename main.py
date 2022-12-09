@@ -6,6 +6,7 @@ from fastapi import FastAPI
 
 # Own Imports
 from config.database import db_connect
+from config.tables import create_db_and_tables
 from core.settings import ledger_settings
 
 # Routers Imports
@@ -20,7 +21,7 @@ app = FastAPI(
     description=ledger_settings.DESCRIPTION,
     version=ledger_settings.API_VERSION,
     contact=ledger_settings.CONTACT,
-    license_info=ledger_settings.LICENSE
+    license_info=ledger_settings.LICENSE,
 )
 
 # Include routers to base router
@@ -51,4 +52,5 @@ async def home() -> dict:
 
 
 if __name__ == "__main__":
+    create_db_and_tables()
     uvicorn.run("main:app", host="0.0.0.0", reload=True)
