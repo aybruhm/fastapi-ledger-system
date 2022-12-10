@@ -109,7 +109,7 @@ def get_sum_of_all_wallets_by_user(
         .filter(User.id == user_id)
         .offset(skip)
         .limit(limit)
-        .with_entities(func(UserWallet.amount).label("total_amount"))
+        .with_entities(func.sum(UserWallet.amount))
         .all()
     )
 
@@ -268,12 +268,8 @@ def get_total_wallet_balance(db: Session, skip: int, limit: int, user_id: int):
     :return: The total balance of all wallets for a user.
     """
 
-    wallets = get_all_wallets_by_user(db, skip, limit, user_id)
-
-    total_balance = 0
-    for wallet in wallets:
-        total_balance += wallet.amount
-    return total_balance
+    wallet = get_sum_of_all_wallets_by_user(db, skip, limit, user_id)
+    return wallet[0][0]
 
 
 def get_wallet_balance(db: Session, user_id: int, wallet_id: int):
