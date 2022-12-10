@@ -1,5 +1,6 @@
 # SQLAlchemy Imports
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 # FastAPI Imports
 from fastapi import HTTPException
@@ -25,7 +26,9 @@ def create_wallet(db: Session, wallet: WalletCreate):
     :return: The wallet that was created.
     """
 
-    db_wallet = UserWallet(title=wallet.title, user=wallet.user, amount=wallet.amount)
+    db_wallet = UserWallet(
+        title=wallet.title, user=wallet.user, amount=wallet.amount
+    )
 
     db.add(db_wallet)
     db.commit()
@@ -54,7 +57,7 @@ def get_all_wallets(db: Session, skip: int, limit: int):
 
 def get_all_wallets_by_user(db: Session, skip: int, limit: int, user_id: int):
     """
-    Tjis function gets all wallets for a user.
+    This function gets all wallets for a user.
 
     :param db: Session - the database session
     :type db: Session
@@ -76,6 +79,37 @@ def get_all_wallets_by_user(db: Session, skip: int, limit: int, user_id: int):
         .filter(User.id == user_id)
         .offset(skip)
         .limit(limit)
+        .all()
+    )
+
+
+def get_sum_of_all_wallets_by_user(
+    db: Session, skip: int, limit: int, user_id: int
+):
+    """
+    This function gets the sum of all wallets for user.
+
+    :param db: Session - the database session
+    :type db: Session
+
+    :param skip: The number of records to skip
+    :type skip: int
+
+    :param limit: The maximum number of items to return
+    :type limit: int
+
+    :param user_id: The id of the user whose wallets you want to retrieve
+    :type user_id: int
+
+    :return : the sum of all wallets for a user
+    """
+    return (
+        db.query(UserWallet)
+        .join(UserWallet.owner)
+        .filter(User.id == user_id)
+        .offset(skip)
+        .limit(limit)
+        .with_entities(func(UserWallet.amount).label("total_amount"))
         .all()
     )
 
