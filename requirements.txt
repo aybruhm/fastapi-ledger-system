@@ -7,3 +7,4 @@ passlib==1.7.4
 bcrypt==4.0.1
 psycopg2-binary==2.9.5
 databases[postgresql]==0.6.2
+pydantic[email]
