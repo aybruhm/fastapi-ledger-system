@@ -2,7 +2,7 @@
 from pydantic import BaseModel, validator
 
 # FastAPI & SQLAlchemy Imports
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 # Core Imports
