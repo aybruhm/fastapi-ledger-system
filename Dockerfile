@@ -17,3 +17,7 @@ RUN pip install --upgrade pip setuptools wheel \
     && rm -rf /root/.cache/pip
 
 COPY . /ledger_be/
+
+# run and make migrations
+RUN chmod +x /ledger_be/run-migrations.sh
+RUN ["./run-migrations.sh"]
