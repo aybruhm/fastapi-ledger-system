@@ -1,16 +1,11 @@
 # Stdlib Imports
-import os
 from logging.config import fileConfig
-
-# SQLALchemy Imports
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
 
 # Alembic Imports
 from alembic import context
 
 # Own Imports
-from config.database import DB_ENGINE
+from config.database import DB_ENGINE, SQLALCHEMY_DATABASE_URL
 from models.user import Base
 
 # this is the Alembic Config object, which provides
@@ -47,7 +42,7 @@ def run_migrations_offline() -> None:
 
     """
     context.configure(
-        url=os.getenv("DATABASE_URL"),
+        url=SQLALCHEMY_DATABASE_URL,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
