@@ -107,53 +107,33 @@ async def wallet_to_wallet_transfer(
 
 @router.post("/transfer/wallet-to-user/")
 async def wallet_to_user_transfer(
-    user_id: int,
     wallet_to_id: int,
     withdraw: WalletWithdraw,
     current_user: UserModel = Depends(get_current_user),
 ) -> dict:
-
-    if current_user.id != withdraw.user:
-        raise HTTPException(
-            401, {"message": "Unauthorized to perform this action!"}
-        )
-
+    
     ledger_operations.withdraw_from_to_user_wallet_transfer(
-        user_id, wallet_to_id, withdraw
+        current_user.id, wallet_to_id, withdraw
     )
     return {
-        "message": f"Transferred NGN{withdraw.amount} to W#{wallet_to_id} U#{user_id} wallet."
+        "message": f"Transferred NGN{withdraw.amount} to W#{wallet_to_id} U#{current_user.id} wallet."
     }
 
 
 @router.get("/balance/")
 async def total_wallet_balance(
-    skip: int = 0,
-    limit: int = 100,
-    user_id: int = None,
     current_user: UserModel = Depends(get_current_user),
 ) -> dict:
-
-    if current_user.id != user_id:
-        raise HTTPException(
-            401, {"message": "Unauthorized to perform this action!"}
-        )
-
-    balance = ledger_operations.get_total_wallet_balance(skip, limit, user_id)
+    
+    balance = ledger_operations.get_total_wallet_balance(current_user.id)
     return {"message": f"Total wallet balance is NGN{balance}"}
 
 
 @router.get("/balance/wallet/")
 async def wallet_balance(
-    user_id: int,
     wallet_id: int,
     current_user: UserModel = Depends(get_current_user),
 ) -> dict:
 
-    if current_user.id != user_id:
-        raise HTTPException(
-            401, {"message": "Unauthorized to perform this action!"}
-        )
-
-    balance = ledger_operations.get_wallet_balance(user_id, wallet_id)
+    balance = ledger_operations.get_wallet_balance(current_user.id, wallet_id)
     return {"message": f"Wallet balance is NGN{balance}"}

@@ -118,16 +118,10 @@ class LedgerOperations:
         return to_wallet
 
     def get_total_wallet_balance(
-        self, skip: int, limit: int, user_id: int
+        self, user_id: int
     ) -> int:
         """
-        This function gets the total sum amomut of the user wallets.
-
-        :param skip: the number of records to skip
-        :type skip: int
-
-        :param limit: The number of wallets to return
-        :type limit: int
+        This function gets the total sum amomut of the user wallets.t
 
         :param user_id: The user id of the user whose wallets you want to get
         :type user_id: int
@@ -135,7 +129,7 @@ class LedgerOperations:
         :return: The total balance of all wallets for a user.
         """
 
-        wallet = get_sum_of_all_wallets_by_user(skip, limit, user_id)
+        wallet = get_sum_of_all_wallets_by_user(user_id)
         return wallet[0][0]
 
     def get_wallet_balance(self, user_id: int, wallet_id: int) -> int:
