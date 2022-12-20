@@ -1,7 +1,8 @@
 # Own Imports
-from orm.base import ORMSessionMixin, Session
-from models.ledger import Wallet as Userwallet
+from orm.base import ORMSessionMixin
 from schemas.ledger import WalletCreate
+from config.database import SessionLocal
+from models.ledger import Wallet as Userwallet
 
 
 class BaseLedgerORM(ORMSessionMixin):
@@ -24,12 +25,10 @@ class LedgerORM(BaseLedgerORM):
         """This method retrives a wallet by its id and user/owner id."""
 
         wallet = (
-            self.BaseLedgerORM.partial_list()
+            self.partial_list()
             .join(Userwallet.owner)
-            .filter_by(
-                Userwallet.user == user_id,
-                Userwallet.id == wallet_id,
-            )
+            .filter(Userwallet.user == user_id)
+            .filter(Userwallet.id == wallet_id)
             .first()
         )
         return wallet
@@ -38,7 +37,7 @@ class LedgerORM(BaseLedgerORM):
         """This method retrieves all the wallets in the database."""
 
         wallets = (
-            self.BaseLedgerORM.partial_list()
+            self.partial_list()
             .offset(self.skip if skip is None else skip)
             .limit(self.limit if limit is None else limit)
             .all()
@@ -55,11 +54,11 @@ class LedgerORM(BaseLedgerORM):
         """
 
         wallets = (
-            self.BaseLedgerORM.partial_list()
+            self.partial_list()
             .offset(self.skip if kwargs["skip"] is None else kwargs["skip"])
             .limit(self.limit if kwargs["limit"] is None else kwargs["limit"])
             .join(Userwallet.owner)
-            .filter_by(Userwallet.user == kwargs["user_id"])
+            .filter(Userwallet.user == kwargs["user_id"])
             .all()
         )
         return wallets
@@ -96,4 +95,4 @@ class LedgerORM(BaseLedgerORM):
         return True
 
 
-ledger_orm = LedgerORM(Session)
+ledger_orm = LedgerORM(SessionLocal())
