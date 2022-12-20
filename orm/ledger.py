@@ -1,5 +1,5 @@
 # Own Imports
-from orm.base import ORMSessionMixin
+from orm.base import ORMSessionMixin, Session
 from models.ledger import Wallet as Userwallet
 from schemas.ledger import WalletCreate
 
@@ -85,3 +85,6 @@ class LedgerORM(ORMSessionMixin):
         self.orm.commit()
 
         return True
+
+
+ledger_orm = LedgerORM(Session)
