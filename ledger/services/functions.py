@@ -56,22 +56,16 @@ def get_all_wallets_by_user(skip: int, limit: int, user_id: int):
     )
 
 
-def get_sum_of_all_wallets_by_user(skip: int, limit: int, user_id: int):
+def get_sum_of_all_wallets_by_user(user_id: int):
     """
     This function gets the sum of all wallets for user.
-
-    :param skip: The number of records to skip
-    :type skip: int
-
-    :param limit: The maximum number of items to return
-    :type limit: int
 
     :param user_id: The id of the user whose wallets you want to retrieve
     :type user_id: int
 
     :return : the sum of all wallets for a user
     """
-    return ledger_aggregate_orm.total_sum(user_id, skip, limit)
+    return ledger_aggregate_orm.total_sum(user_id)
 
 
 def get_single_wallet(user_id: int, wallet_id: int):
