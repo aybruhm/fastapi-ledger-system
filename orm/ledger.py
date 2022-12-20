@@ -4,8 +4,8 @@ from models.ledger import Wallet as Userwallet
 from schemas.ledger import WalletCreate
 
 
-class LedgerORM(ORMSessionMixin):
-    """Ledger ORM responsible for interacting with the database."""
+class BaseLedgerORM(ORMSessionMixin):
+    """Base Ledger ORM responsible for interacting with the database."""
 
     skip: int = 0
     limit: int = 10
@@ -16,11 +16,15 @@ class LedgerORM(ORMSessionMixin):
         wallets = self.orm.query(Userwallet)
         return wallets
 
+
+class LedgerORM(BaseLedgerORM):
+    """CRUD Operations for the ledger to interact with the database."""
+
     def get(self, user_id: int, wallet_id: int):
         """This method retrives a wallet by its id and user/owner id."""
 
         wallet = (
-            self.partial_list()
+            self.BaseLedgerORM.partial_list()
             .join(Userwallet.owner)
             .filter_by(
                 Userwallet.user == user_id,
@@ -30,10 +34,15 @@ class LedgerORM(ORMSessionMixin):
         )
         return wallet
 
-    def list(self):
+    def list(self, skip: int, limit: int):
         """This method retrieves all the wallets in the database."""
 
-        wallets = self.partial_list().all()
+        wallets = (
+            self.BaseLedgerORM.partial_list()
+            .offset(self.skip if skip is None else skip)
+            .limit(self.limit if limit is None else limit)
+            .all()
+        )
         return wallets
 
     def filter(self, **kwargs):
@@ -46,7 +55,7 @@ class LedgerORM(ORMSessionMixin):
         """
 
         wallets = (
-            self.partial_list()
+            self.BaseLedgerORM.partial_list()
             .offset(self.skip if kwargs["skip"] is None else kwargs["skip"])
             .limit(self.limit if kwargs["limit"] is None else kwargs["limit"])
             .join(Userwallet.owner)
