@@ -36,7 +36,7 @@ class LedgerORM(BaseLedgerORM):
         )
         return wallet
 
-    def list(self, skip: int, limit: int) -> List[Userwallet]:
+    async def list(self, skip: int, limit: int) -> List[Userwallet]:
         """This method retrieves all the wallets in the database."""
 
         wallets = (
@@ -47,7 +47,7 @@ class LedgerORM(BaseLedgerORM):
         )
         return wallets
 
-    def filter(self, **kwargs) -> List[Userwallet]:
+    async def filter(self, **kwargs) -> List[Userwallet]:
         """
         This method filters the list of of user wallets by:
 
@@ -66,7 +66,7 @@ class LedgerORM(BaseLedgerORM):
         )
         return wallets
 
-    def create(self, wallet: WalletCreate) -> Userwallet:
+    async def create(self, wallet: WalletCreate) -> Userwallet:
         """This method creates a new wallet."""
 
         user_wallet = Userwallet(**wallet.dict())
@@ -77,7 +77,7 @@ class LedgerORM(BaseLedgerORM):
 
         return user_wallet
 
-    def update(self, **kwargs) -> Userwallet:
+    async def update(self, **kwargs) -> Userwallet:
         """This method updates a wallet."""
 
         wallet = self.orm.query(Userwallet).update(kwargs)
@@ -87,7 +87,7 @@ class LedgerORM(BaseLedgerORM):
 
         return wallet
 
-    def delete(self, wallet_id: int) -> bool:
+    async def delete(self, wallet_id: int) -> bool:
         """This method deletes a wallet."""
 
         self.orm.query(Userwallet).filter_by(
