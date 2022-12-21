@@ -85,7 +85,7 @@ class AuthHandler:
             decoded_token = jwt.decode(
                 token, self.JWT_SECRET, algorithms=self.JWT_ALGORITHM
             )
-        except:
+        except (jwt.DecodeError, Exception):
             raise HTTPException(403, {"message": "Token invalid."})
 
         if (
