@@ -54,10 +54,10 @@ class UsersORM(BaseUsersORM):
             .all()
         )
 
-    async def create(self, user: UserCreate) -> User:
+    async def create(self, user: UserCreate, password: str) -> User:
         """This method creates a new user."""
 
-        user = User(**user.dict())
+        user = User(name=user.name, email=user.email, password=password)
 
         self.orm.add(user)
         self.orm.commit()
