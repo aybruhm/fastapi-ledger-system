@@ -14,6 +14,7 @@ class UserCreate(UserBase):
 class User(UserBase):
     id: int
     is_active: bool
+    is_admin: bool
     wallets: list[Wallet] = []
 
     class Config:
