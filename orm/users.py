@@ -6,6 +6,7 @@ from sqlalchemy.orm import joinedload
 
 # Own Imports
 from models.user import User
+from schemas.user import UserCreate
 from orm.base import ORMSessionMixin
 from config.database import SessionLocal
 
@@ -18,7 +19,7 @@ class BaseUsersORM(ORMSessionMixin):
 
 
 class UsersORM(BaseUsersORM):
-    """GET Operations for the users to interact with the database."""
+    """CRUD Operations for the users to interact with the database."""
 
     async def get(self, user_id: int) -> User:
         """This method gets a user from the database."""
@@ -41,6 +42,17 @@ class UsersORM(BaseUsersORM):
             .limit(limit)
             .all()
         )
-        
-        
+
+    async def create(self, user: UserCreate) -> User:
+        """This method creates a new user."""
+
+        user = User(**user.dict())
+
+        self.orm.add(user)
+        self.orm.commit()
+        self.orm.refresh(user)
+
+        return user
+
+
 users_orm = UsersORM(SessionLocal())
