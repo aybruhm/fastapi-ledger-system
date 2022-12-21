@@ -55,10 +55,10 @@ class LedgerORM(BaseLedgerORM):
 
         wallets = (
             self.partial_list()
-            .offset(self.skip if kwargs["skip"] is None else kwargs["skip"])
-            .limit(self.limit if kwargs["limit"] is None else kwargs["limit"])
             .join(Userwallet.owner)
             .filter(Userwallet.user == kwargs["user_id"])
+            .offset(self.skip if kwargs["skip"] is None else kwargs["skip"])
+            .limit(self.limit if kwargs["limit"] is None else kwargs["limit"])
             .all()
         )
         return wallets
