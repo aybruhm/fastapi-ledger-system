@@ -32,6 +32,17 @@ class UsersORM(BaseUsersORM):
         )
         return user
 
+    async def get_email(self, user_email: str) -> User:
+        """This method gets a user based on their email from the database."""
+
+        user = (
+            self.partial_list()
+            .options(joinedload(User.wallets))
+            .filter(User.email == user_email)
+            .first()
+        )
+        return user
+
     async def list(self, skip: int, limit: int) -> List[User]:
         """This method gets all the users from the database."""
 
