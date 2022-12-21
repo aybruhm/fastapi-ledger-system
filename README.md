@@ -38,3 +38,15 @@ docker-compose up --build
 ```
 
 The service will build and run on port `8080`.
+
+5). Launch a new terminal session and run the following commands:
+
+```bash
+chmod +x run-migrations.sh
+```
+
+```bash
+./run-migrations.sh
+```
+
+The above commands would activate the script file and when ran- will make database migrations for you automatically.
