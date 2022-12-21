@@ -8,7 +8,7 @@ from orm.ledger import BaseLedgerORM, Userwallet, SessionLocal
 class LedgerAggregateORM(BaseLedgerORM):
     """ORM responsible for performing aggregate operations."""
 
-    def total_sum(self, user_id: int):
+    async def total_sum(self, user_id: int):
         """This method aggregates the amount of a user wallet."""
 
         return (

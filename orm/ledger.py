@@ -1,3 +1,6 @@
+# Stdlib Imports
+from typing import List
+
 # Own Imports
 from orm.base import ORMSessionMixin
 from schemas.ledger import WalletCreate
@@ -21,7 +24,7 @@ class BaseLedgerORM(ORMSessionMixin):
 class LedgerORM(BaseLedgerORM):
     """CRUD Operations for the ledger to interact with the database."""
 
-    def get(self, user_id: int, wallet_id: int):
+    async def get(self, user_id: int, wallet_id: int) -> Userwallet:
         """This method retrives a wallet by its id and user/owner id."""
 
         wallet = (
@@ -33,7 +36,7 @@ class LedgerORM(BaseLedgerORM):
         )
         return wallet
 
-    def list(self, skip: int, limit: int):
+    def list(self, skip: int, limit: int) -> List[Userwallet]:
         """This method retrieves all the wallets in the database."""
 
         wallets = (
@@ -44,7 +47,7 @@ class LedgerORM(BaseLedgerORM):
         )
         return wallets
 
-    def filter(self, **kwargs):
+    def filter(self, **kwargs) -> List[Userwallet]:
         """
         This method filters the list of of user wallets by:
 
@@ -63,7 +66,7 @@ class LedgerORM(BaseLedgerORM):
         )
         return wallets
 
-    def create(self, wallet: WalletCreate):
+    def create(self, wallet: WalletCreate) -> Userwallet:
         """This method creates a new wallet."""
 
         user_wallet = Userwallet(**wallet.dict())
@@ -74,7 +77,7 @@ class LedgerORM(BaseLedgerORM):
 
         return user_wallet
 
-    def update(self, **kwargs):
+    def update(self, **kwargs) -> Userwallet:
         """This method updates a wallet."""
 
         wallet = self.orm.query(Userwallet).update(kwargs)
@@ -84,7 +87,7 @@ class LedgerORM(BaseLedgerORM):
 
         return wallet
 
-    def delete(self, wallet_id: int):
+    def delete(self, wallet_id: int) -> bool:
         """This method deletes a wallet."""
 
         self.orm.query(Userwallet).filter_by(
