@@ -90,4 +90,4 @@ def get_single_wallet(
 
     if wallet:
         return wallet
-    raise HTTPException(400, {"message": "Wallet does not exist!"})
+    raise HTTPException(404, {"message": "Wallet does not exist!"})
