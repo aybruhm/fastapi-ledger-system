@@ -1,13 +1,17 @@
+# Stdlib Imports
+from typing import Union, List
+
 # FastAPI Imports
 from fastapi import HTTPException
 
 # ORM Imports
 from orm.ledger import ledger_orm
-from orm.aggregate import ledger_aggregate_orm
 from schemas.ledger import WalletCreate
+from models.ledger import Wallet as UserWallet
+from orm.aggregate import ledger_aggregate_orm
 
 
-def create_wallet(wallet: WalletCreate):
+def create_wallet(wallet: WalletCreate) -> UserWallet:
     """
     It creates a new wallet in the database.
 
@@ -21,7 +25,7 @@ def create_wallet(wallet: WalletCreate):
     return wallet
 
 
-def get_all_wallets(skip: int, limit: int):
+def get_all_wallets(skip: int, limit: int) -> List[UserWallet]:
     """
     This function gets all wallets from the database.
 
@@ -36,7 +40,7 @@ def get_all_wallets(skip: int, limit: int):
     return ledger_orm.list(skip, limit)
 
 
-def get_all_wallets_by_user(skip: int, limit: int, user_id: int):
+def get_all_wallets_by_user(skip: int, limit: int, user_id: int) -> List[UserWallet]:
     """
     This function gets all wallets for a user.
 
@@ -56,7 +60,7 @@ def get_all_wallets_by_user(skip: int, limit: int, user_id: int):
     )
 
 
-def get_sum_of_all_wallets_by_user(user_id: int):
+def get_sum_of_all_wallets_by_user(user_id: int) -> int:
     """
     This function gets the sum of all wallets for user.
 
@@ -68,7 +72,9 @@ def get_sum_of_all_wallets_by_user(user_id: int):
     return ledger_aggregate_orm.total_sum(user_id)
 
 
-def get_single_wallet(user_id: int, wallet_id: int):
+def get_single_wallet(
+    user_id: int, wallet_id: int
+) -> Union[UserWallet, Exception]:
     """
     Get a single wallet from the database, otherwise; raise a HTTP Exception.
 
