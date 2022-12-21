@@ -35,7 +35,7 @@ async def create_wallet(
             401, {"message": "Unauthorized to perform this action!"}
         )
 
-    db_wallet = create_user_wallet(wallet)
+    db_wallet = await create_user_wallet(wallet)
     return db_wallet
 
 
@@ -47,7 +47,7 @@ async def get_wallets(
 ):
 
     if current_user:
-        db_wallets = get_all_wallets_by_user(skip, limit, current_user.id)
+        db_wallets = await get_all_wallets_by_user(skip, limit, current_user.id)
         return db_wallets
 
     raise HTTPException(
@@ -66,7 +66,7 @@ async def deposit_money(
             401, {"message": "Unauthorized to perform this action!"}
         )
 
-    ledger_operations.deposit_money_to_wallet(deposit)
+    await ledger_operations.deposit_money_to_wallet(deposit)
     return {"message": f"NGN{deposit.amount} deposit successful!"}
 
 
@@ -81,7 +81,7 @@ async def withdraw_money(
             401, {"message": "Unauthorized to perform this action!"}
         )
 
-    ledger_operations.withdraw_money_from_wallet(withdraw)
+    await ledger_operations.withdraw_money_from_wallet(withdraw)
     return {"message": f"NGN{withdraw.amount} withdrawn successful!"}
 
 
@@ -97,26 +97,29 @@ async def wallet_to_wallet_transfer(
             401, {"message": "Unauthorized to perform this action!"}
         )
 
-    ledger_operations.withdraw_from_to_wallet_transfer(
+    await ledger_operations.withdraw_from_to_wallet_transfer(
         wallet_from_id, withdraw
     )
     return {
-        "message": f"NGN{withdraw.amount} was transfered from W#{wallet_from_id} wallet to W#{withdraw.id} wallet!"
+        "message": f"NGN{withdraw.amount} was transfered from \
+            W#{wallet_from_id} wallet to W#{withdraw.id} wallet!"
     }
 
 
 @router.post("/transfer/wallet-to-user/")
 async def wallet_to_user_transfer(
-    wallet_to_id: int,
+    user_wallet: int,
+    user_id:int,
     withdraw: WalletWithdraw,
     current_user: UserModel = Depends(get_current_user),
 ) -> dict:
     
-    ledger_operations.withdraw_from_to_user_wallet_transfer(
-        current_user.id, wallet_to_id, withdraw
+    await ledger_operations.withdraw_from_to_user_wallet_transfer(
+        user_id, user_wallet, withdraw
     )
     return {
-        "message": f"Transferred NGN{withdraw.amount} to W#{wallet_to_id} U#{current_user.id} wallet."
+        "message": f"Transferred NGN{withdraw.amount} \
+            to U#{current_user.id} W#{user_wallet} wallet."
     }
 
 
@@ -125,7 +128,7 @@ async def total_wallet_balance(
     current_user: UserModel = Depends(get_current_user),
 ) -> dict:
     
-    balance = ledger_operations.get_total_wallet_balance(current_user.id)
+    balance = await ledger_operations.get_total_wallet_balance(current_user.id)
     return {"message": f"Total wallet balance is NGN{balance}"}
 
 
@@ -135,5 +138,8 @@ async def wallet_balance(
     current_user: UserModel = Depends(get_current_user),
 ) -> dict:
 
-    balance = ledger_operations.get_wallet_balance(current_user.id, wallet_id)
-    return {"message": f"Wallet balance is NGN{balance}"}
+    balance = await ledger_operations.get_wallet_balance(current_user.id, wallet_id)
+    
+    if balance is None:
+        raise HTTPException(404, {"message": "Wallet does not exist!"})
+    return {"message": f"Wallet balance is NGN{balance.amount}"}
