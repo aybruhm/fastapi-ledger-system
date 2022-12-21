@@ -21,7 +21,11 @@ async def create_wallet(wallet: WalletCreate) -> UserWallet:
     return wallet
 
 
-async def get_all_wallets_by_user(skip: int, limit: int, user_id: int) -> List[UserWallet]:
+async def get_all_wallets_by_user(
+    skip: int, 
+    limit: int, 
+    user_id: int
+) -> List[UserWallet]:
     """
     This function gets all wallets for a user.
 
