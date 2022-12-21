@@ -1,11 +1,10 @@
 # FastAPI Imports
 from fastapi import Depends, HTTPException
-from sqlalchemy.orm import Session
 
 # Own Imports Imports
-from auth.auth_bearer import JWTBearer
+from orm.users import users_orm
+from auth.auth_bearer import jwt_bearer
 from config.database import SessionLocal
-from users import services
 
 # 3rd Party Imports
 import jwt
@@ -20,16 +19,11 @@ def get_db():
         db.close()
 
 
-def get_current_user(
-    db: Session = Depends(get_db), token: str = Depends(JWTBearer())
-):
+async def get_current_user(token: str = Depends(jwt_bearer)):
 
     """
-    This function takes a database session and a JWT token,
+    This function takes a JWT token,
     and returns the user that the token belongs to.
-
-    :param db: Session = Depends(get_db)
-    :type db: Session
 
     :param token: str = Depends(JWTBearer())
     :type token: str
@@ -43,7 +37,7 @@ def get_current_user(
     except (jwt.PyJWTError, Exception):
         raise HTTPException(403, {"message": "Could not validate token."})
 
-    user = services.get_user(db, payload["user_id"])
+    user = await users_orm.get(payload["user_id"])
     if not user:
         raise HTTPException(404, {"message": "User does not exist!"})
     return user
