@@ -4,7 +4,7 @@ import os
 # SQLAlchemy Imports
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 
 # Third Party Imports
 from databases import Database
@@ -19,7 +19,8 @@ DB_ENGINE = create_engine(
 # It's not needed for other databases.
 
 # Construct a session maker
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=DB_ENGINE)
+session_faction = sessionmaker(autocommit=False, autoflush=False, bind=DB_ENGINE)
+SessionLocal = scoped_session(session_faction)
 
 # Construct a base class for declarative class definitions.
 Base = declarative_base()
