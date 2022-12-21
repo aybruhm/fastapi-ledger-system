@@ -81,16 +81,19 @@ class AuthHandler:
         :return: A dictionary of the decoded token | error message.
         """
 
-        decoded_token = jwt.decode(
-            token, self.JWT_SECRET, algorithms=self.JWT_ALGORITHM
-        )
+        try:
+            decoded_token = jwt.decode(
+                token, self.JWT_SECRET, algorithms=self.JWT_ALGORITHM
+            )
+        except:
+            raise HTTPException(403, {"message": "Token invalid."})
 
         if (
             datetime.strptime(decoded_token["expires"], "%Y-%m-%d %H:%M:%S.%f")
             >= datetime.now()
         ):
             return decoded_token
-        raise HTTPException(403, {"message": "Token invalid."})
+        raise HTTPException(400, {"message": "Token expired."})
 
 
 authentication = AuthHandler()
