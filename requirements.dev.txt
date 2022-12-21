@@ -1,3 +1,4 @@
 -r requirements.txt
 
 black==22.10.0
+ruff==0.0.189
