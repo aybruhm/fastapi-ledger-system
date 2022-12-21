@@ -1,13 +1,12 @@
 # SQLAlchemy Imports
 from sqlalchemy.orm import Session
 
-# Schemas Imports
+# Own Imports
+from config.database import SessionLocal
 from models.ledger import Wallet as UserWallet
 from schemas.ledger import WalletWithdraw, WalletDeposit
-from ledger.services.functions import (
-    get_single_wallet,
-    get_sum_of_all_wallets_by_user,
-)
+from orm.ledger import ledger_orm
+from orm.aggregate import ledger_aggregate_orm
 
 
 class LedgerOperations:
@@ -25,7 +24,9 @@ class LedgerOperations:
     def __init__(self, db: Session):
         self.db = db
 
-    def deposit_money_to_wallet(self, deposit: WalletDeposit) -> UserWallet:
+    async def deposit_money_to_wallet(
+        self, deposit: WalletDeposit
+    ) -> UserWallet:
         """
         This function deposit x amount to the user wallet.
 
@@ -35,15 +36,15 @@ class LedgerOperations:
         :return: The wallet that has been topped up.
         """
 
-        topup_wallet = get_single_wallet(deposit.user, deposit.id)
+        topup_wallet = await ledger_orm.get(deposit.user, deposit.id)
         topup_wallet.amount += deposit.amount
 
         self.db.commit()
-        self.db.refresh(topup_wallet)
+        self.db.refresh(topup_wallet, ["amount"])
 
         return topup_wallet
 
-    def withdraw_money_from_wallet(
+    async def withdraw_money_from_wallet(
         self, withdraw: WalletWithdraw
     ) -> UserWallet:
         """
@@ -55,21 +56,23 @@ class LedgerOperations:
         :return: The wallet that was just updated.
         """
 
-        withdraw_wallet = get_single_wallet(withdraw.user, withdraw.id)
+        withdraw_wallet = await ledger_orm.get(withdraw.user, withdraw.id)
         withdraw_wallet.amount -= withdraw.amount
 
         self.db.commit()
-        self.db.refresh(withdraw_wallet)
+        self.db.refresh(withdraw_wallet, ["amount"])
 
         return withdraw_wallet
 
-    def withdraw_from_to_wallet_transfer(
+    async def withdraw_from_to_wallet_transfer(
         self, from_wallet_id: int, withdraw: WalletWithdraw
     ) -> UserWallet:
         """
-        This function is responsible for transferring x amount from wallet y to wallet z.
+        This function is responsible for transferring x amount 
+        from wallet y to wallet z.
 
-        :param from_wallet_id: The wallet id of the wallet you want to withdraw from
+        :param from_wallet_id: The wallet id of the wallet 
+            you want to withdraw from
         :type from_wallet_id: int
 
         :param withdraw: schemas.WalletWithdraw
@@ -78,25 +81,27 @@ class LedgerOperations:
         :return: The to_wallet is being returned.
         """
 
-        from_wallet = get_single_wallet(withdraw.user, from_wallet_id)
-        to_wallet = get_single_wallet(withdraw.user, withdraw.id)
+        from_wallet = await ledger_orm.get(withdraw.user, from_wallet_id)
+        to_wallet = await ledger_orm.get(withdraw.user, withdraw.id)
 
         from_wallet.amount -= withdraw.amount
         to_wallet.amount += withdraw.amount
 
         self.db.commit()
-        self.db.refresh(from_wallet)
-        self.db.refresh(to_wallet)
+        self.db.refresh(from_wallet, ["amount"])
+        self.db.refresh(to_wallet, ["amount"])
 
         return to_wallet
 
-    def withdraw_from_to_user_wallet_transfer(
+    async def withdraw_from_to_user_wallet_transfer(
         self, user_id: int, wallet_to: int, withdraw: WalletWithdraw
     ) -> UserWallet:
         """
-        This function is responsible for transferring x amount from wallet y to user z wallet.
+        This function is responsible for transferring x amount 
+        from wallet y to user z wallet.
 
-        :param from_wallet_id: The wallet id of the wallet you want to withdraw from
+        :param from_wallet_id: The wallet id of the wallet 
+            you want to withdraw from
         :type from_wallet_id: int
 
         :param withdraw: schemas.WalletWithdraw
@@ -105,21 +110,19 @@ class LedgerOperations:
         :return: The to_wallet is being returned.
         """
 
-        from_wallet = get_single_wallet(withdraw.user, withdraw.id)
-        to_wallet = get_single_wallet(user_id, wallet_to)
+        from_wallet = await ledger_orm.get(withdraw.user, withdraw.id)
+        to_wallet = await ledger_orm.get(user_id, wallet_to)
 
         from_wallet.amount -= withdraw.amount
         to_wallet.amount += withdraw.amount
 
         self.db.commit()
-        self.db.refresh(from_wallet)
-        self.db.refresh(to_wallet)
+        self.db.refresh(from_wallet, ["amount"])
+        self.db.refresh(to_wallet, ["amount"])
 
         return to_wallet
 
-    def get_total_wallet_balance(
-        self, user_id: int
-    ) -> int:
+    async def get_total_wallet_balance(self, user_id: int) -> int:
         """
         This function gets the total sum amomut of the user wallets.t
 
@@ -129,10 +132,12 @@ class LedgerOperations:
         :return: The total balance of all wallets for a user.
         """
 
-        wallet = get_sum_of_all_wallets_by_user(user_id)
+        wallet = await ledger_aggregate_orm.total_sum(user_id)
         return wallet[0][0]
 
-    def get_wallet_balance(self, user_id: int, wallet_id: int) -> int:
+    async def get_wallet_balance(
+        self, user_id: int, wallet_id: int
+    ) -> UserWallet:
         """
         This function gets the balance of a single wallet.
 
@@ -145,8 +150,8 @@ class LedgerOperations:
         :return: The balance of the wallet
         """
 
-        wallet = get_single_wallet(user_id, wallet_id)
-        return wallet.amount
+        wallet = await ledger_orm.get(user_id, wallet_id)
+        return wallet
 
 
-ledger_operations = LedgerOperations(Session)
+ledger_operations = LedgerOperations(SessionLocal)
