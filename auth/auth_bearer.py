@@ -13,7 +13,8 @@ class JWTBearer(HTTPBearer):
         """
         The method __init__() is a constructor of the class JWTBearer
 
-        :param auto_error: If True, the middleware will raise an error if the token is invalid. If
+        :param auto_error: If True, the middleware will raise an error 
+            if the token is invalid. If
         False, the middleware will return a 401 response, defaults to True
 
         :type auto_error: bool (optional)
@@ -47,7 +48,8 @@ class JWTBearer(HTTPBearer):
 
     def verify_jwt_token(self, token: str) -> bool:
         """
-        This method takes a JWT token as an argument, decodes it and returns a boolean value.
+        This method takes a JWT token as an argument, 
+        decodes it and returns a boolean value.
 
         :param token: The token that you want to verify
         :type token: str
