@@ -1,17 +1,14 @@
 # FastAPI Imports
-from fastapi import APIRouter, HTTPException
+from fastapi import HTTPException
 
 # Own Imports
 from orm.users import users_orm
+from users.router import router
 from users.services import create_user
 from auth.auth_handler import authentication
 from auth.hashers import pwd_hasher
 from schemas.user import User, UserCreate
 from schemas.auth import UserLoginSchema
-
-
-# Initialize api router
-router = APIRouter()
 
 
 @router.post("/users/", response_model=User)

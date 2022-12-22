@@ -1,20 +1,19 @@
 # FastAPI Imports
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import Depends, HTTPException
 
 # Core Imports
 from schemas.user import User
+from users.router import router
 from orm.users import users_orm
 from auth.auth_bearer import jwt_bearer
 from core.constants import get_db, get_current_user, get_admin_user
 
 
-# Initialize jwt bearer and api router
-router = APIRouter(
-    dependencies=[
-        Depends(jwt_bearer),
-        Depends(get_db),
-    ]
-)
+# add dependencies needed for api
+router.dependencies = [
+    Depends(jwt_bearer),
+    Depends(get_db),
+]
 
 
 @router.get("/users/", response_model=list[User])
