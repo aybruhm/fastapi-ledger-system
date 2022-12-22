@@ -19,6 +19,7 @@ class PasswordHasher:
 
         :param password: The password to hash
         :type password: str
+        
         :return: The hashed password.
         """
         return self.password_context.hash(password)
