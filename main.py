@@ -10,6 +10,7 @@ from core.settings import ledger_settings
 
 # Routers Imports
 from users.auth import router as auth_router
+from users.api import router as users_router
 from ledger.api import router as ledger_router
 
 
@@ -23,7 +24,8 @@ app = FastAPI(
 )
 
 # Include routers to base router
-app.include_router(auth_router, tags=["Users/Auth"])
+app.include_router(auth_router)
+app.include_router(users_router, tags=["Users"])
 app.include_router(ledger_router, tags=["Ledger"])
 
 
