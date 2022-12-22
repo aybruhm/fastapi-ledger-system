@@ -11,6 +11,10 @@ from schemas.user import User, UserCreate
 from schemas.auth import UserLoginSchema
 
 
+# Remove dependencies
+router.dependencies.clear()
+
+
 @router.post("/users/", response_model=User)
 async def create_new_user(new_user: UserCreate):
     user = await users_orm.get_email(new_user.email)

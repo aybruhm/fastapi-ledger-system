@@ -1,28 +1,16 @@
 # FastAPI Imports
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import HTTPException, Depends
 
-# Auth Imports
-from auth.auth_bearer import jwt_bearer
-
-# Core Imports
-from core.constants import get_db, get_current_user
-
-# Models Imports
+# Own Imports
+from ledger.router import router
+from core.constants import get_current_user
 from models.user import User as UserModel
-
-# Services Imports
 from ledger.services.operations import ledger_operations
 from ledger.services.functions import (
     get_all_wallets_by_user,
     create_wallet as create_user_wallet,
 )
-
-# Schema Imports
 from schemas.ledger import Wallet, WalletCreate, WalletDeposit, WalletWithdraw
-
-
-# Initialze fastapi app
-router = APIRouter(dependencies=[Depends(jwt_bearer), Depends(get_db)])
 
 
 @router.post("/wallets/", response_model=Wallet)
@@ -47,7 +35,9 @@ async def get_wallets(
 ):
 
     if current_user:
-        db_wallets = await get_all_wallets_by_user(skip, limit, current_user.id)
+        db_wallets = await get_all_wallets_by_user(
+            skip, limit, current_user.id
+        )
         return db_wallets
 
     raise HTTPException(
@@ -109,11 +99,11 @@ async def wallet_to_wallet_transfer(
 @router.post("/transfer/wallet-to-user/")
 async def wallet_to_user_transfer(
     user_wallet: int,
-    user_id:int,
+    user_id: int,
     withdraw: WalletWithdraw,
     current_user: UserModel = Depends(get_current_user),
 ) -> dict:
-    
+
     await ledger_operations.withdraw_from_to_user_wallet_transfer(
         user_id, user_wallet, withdraw
     )
@@ -127,7 +117,7 @@ async def wallet_to_user_transfer(
 async def total_wallet_balance(
     current_user: UserModel = Depends(get_current_user),
 ) -> dict:
-    
+
     balance = await ledger_operations.get_total_wallet_balance(current_user.id)
     return {"message": f"Total wallet balance is NGN{balance}"}
 
@@ -138,8 +128,10 @@ async def wallet_balance(
     current_user: UserModel = Depends(get_current_user),
 ) -> dict:
 
-    balance = await ledger_operations.get_wallet_balance(current_user.id, wallet_id)
-    
+    balance = await ledger_operations.get_wallet_balance(
+        current_user.id, wallet_id
+    )
+
     if balance is None:
         raise HTTPException(404, {"message": "Wallet does not exist!"})
     return {"message": f"Wallet balance is NGN{balance.amount}"}
