@@ -6,11 +6,9 @@ from fastapi import FastAPI
 
 # Own Imports
 from config.database import db_connect
-from config.tables import create_db_and_tables
 from core.settings import ledger_settings
 
 # Routers Imports
-from users.api import router as api_router
 from users.auth import router as auth_router
 from ledger.api import router as ledger_router
 
@@ -25,8 +23,7 @@ app = FastAPI(
 )
 
 # Include routers to base router
-app.include_router(api_router, tags=["Users"])
-app.include_router(auth_router, tags=["Auth"])
+app.include_router(auth_router, tags=["Users/Auth"])
 app.include_router(ledger_router, tags=["Ledger"])
 
 
@@ -52,5 +49,4 @@ async def home() -> dict:
 
 
 if __name__ == "__main__":
-    create_db_and_tables()
     uvicorn.run("main:app", host="0.0.0.0", reload=True)
