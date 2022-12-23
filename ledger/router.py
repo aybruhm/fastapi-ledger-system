@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 
 # Own Imports
 from auth.auth_bearer import jwt_bearer
-from core.constants import get_db
+from core.deps import get_db
 
 
 # initialize router

@@ -5,7 +5,7 @@ from fastapi import Depends, HTTPException
 from schemas.user import User
 from users.router import router
 from orm.users import users_orm
-from core.constants import get_current_user, get_admin_user
+from core.deps import get_current_user, get_admin_user
 
 
 @router.get("/users/", response_model=list[User])

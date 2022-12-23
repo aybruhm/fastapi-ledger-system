@@ -3,7 +3,7 @@ from fastapi import HTTPException, Depends
 
 # Own Imports
 from ledger.router import router
-from core.constants import get_current_user
+from core.deps import get_current_user
 from models.user import User as UserModel
 from ledger.services.operations import ledger_operations
 from ledger.services.functions import (
