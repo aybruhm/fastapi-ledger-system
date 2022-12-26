@@ -43,7 +43,9 @@ class WalletCreate(WalletBase):
         )
 
         if user_wallet_counts == 10:
-            raise HTTPException(400, {"message": "User can only have ten wallet!"})
+            raise HTTPException(
+                400, {"message": "User can only have ten wallet!"}
+            )
         return value
 
 
@@ -53,16 +55,17 @@ class WalletDeposit(WalletBase):
 
 class WalletWithdraw(WalletBase):
     id: int
-    
+
 
 class Wallet2WalletTransfer(WalletBase):
     wallet_from: int
     wallet_to: int
-    
+
 
 class Wallet2UserWalletTransfer(WalletBase):
     wallet_from: int
-    user_wallet_to: int
+    wallet_to: int
+    user_to: int
 
 
 class Wallet(WalletBase):
