@@ -14,7 +14,7 @@ async def users_info(
 ):
 
     if admin_user is None:
-        raise HTTPException(404, {"Admin user does not exist!"})
+        raise HTTPException(404, {"message": "Admin user does not exist!"})
 
     users = await users_orm.list(skip, limit)
     return users
