@@ -10,7 +10,14 @@ from ledger.services.functions import (
     get_all_wallets_by_user,
     create_wallet as create_user_wallet,
 )
-from schemas.ledger import Wallet, WalletCreate, WalletDeposit, WalletWithdraw
+from schemas.ledger import (
+    Wallet,
+    Wallet2UserWalletTransfer,
+    Wallet2WalletTransfer,
+    WalletCreate,
+    WalletDeposit,
+    WalletWithdraw,
+)
 
 
 @router.post("/wallets/", response_model=Wallet)
@@ -77,8 +84,7 @@ async def withdraw_money(
 
 @router.post("/transfer/wallet-to-wallet/")
 async def wallet_to_wallet_transfer(
-    wallet_from_id: int,
-    withdraw: WalletWithdraw,
+    withdraw: Wallet2WalletTransfer,
     current_user: UserModel = Depends(get_current_user),
 ) -> dict:
 
@@ -87,29 +93,28 @@ async def wallet_to_wallet_transfer(
             401, {"message": "Unauthorized to perform this action!"}
         )
 
-    await ledger_operations.withdraw_from_to_wallet_transfer(
-        wallet_from_id, withdraw
-    )
+    await ledger_operations.withdraw_from_to_wallet_transfer(withdraw)
     return {
         "message": f"NGN{withdraw.amount} was transfered from \
-            W#{wallet_from_id} wallet to W#{withdraw.id} wallet!"
+            W#{withdraw.wallet_from} wallet to W#{withdraw.wallet_to} wallet!"
     }
 
 
 @router.post("/transfer/wallet-to-user/")
 async def wallet_to_user_transfer(
-    user_wallet: int,
-    user_id: int,
-    withdraw: WalletWithdraw,
+    withdraw: Wallet2UserWalletTransfer,
     current_user: UserModel = Depends(get_current_user),
 ) -> dict:
 
-    await ledger_operations.withdraw_from_to_user_wallet_transfer(
-        user_id, user_wallet, withdraw
-    )
+    if current_user.id != withdraw.user:
+        raise HTTPException(
+            401, {"message": "Unauthorized to perform this action!"}
+        )
+
+    await ledger_operations.withdraw_from_to_user_wallet_transfer(withdraw)
     return {
         "message": f"Transferred NGN{withdraw.amount} \
-            to U#{current_user.id} W#{user_wallet} wallet."
+            to U#{withdraw.user_to} W#{withdraw.wallet_to} wallet."
     }
 
 
