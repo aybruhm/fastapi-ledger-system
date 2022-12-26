@@ -1,6 +1,9 @@
 # Stdlib Imports
 from typing import List
 
+# FastAPI Imports
+from fastapi import HTTPException
+
 # Own Imports
 from orm.base import ORMSessionMixin
 from schemas.ledger import WalletCreate
@@ -19,6 +22,35 @@ class BaseLedgerORM(ORMSessionMixin):
 
         wallets = self.orm.query(Userwallet)
         return wallets
+
+    def partial_filter(self, values: dict[str, int]):
+        """
+        This method partially retrieves a user wallet
+        and locks the row for update.
+
+        Values:
+            - walled_id: int
+            - user_id: int
+        """
+
+        wallet = (
+            self.partial_list()
+            .filter(
+                Userwallet.id == values["wallet_id"],
+                Userwallet.user == values["user_id"],
+            )
+            .with_for_update()
+            .first()
+        )
+
+        if wallet is None:
+            raise HTTPException(
+                404,
+                {
+                    "message": f"Wallet ID:{values['wallet_id']} does not exist!"
+                },
+            )
+        return wallet
 
 
 class LedgerORM(BaseLedgerORM):
@@ -77,10 +109,24 @@ class LedgerORM(BaseLedgerORM):
 
         return user_wallet
 
-    async def update(self, **kwargs) -> Userwallet:
+    async def update(self, wallet_id: int, **kwargs) -> Userwallet:
         """This method updates a wallet."""
 
-        wallet = self.orm.query(Userwallet).update(kwargs)
+        # achieve safe update operation
+        # -----------
+
+        # solution 1
+        # hange the value directly with the column value
+        wallet = self.partial_list().filter_by(id=wallet_id).update(kwargs)
+
+        # solution 2
+        # locks row for this particular wallet
+        wallet = (
+            self.partial_list()
+            .filter_by(id=wallet_id)
+            .with_for_update()
+            .update(kwargs)
+        )
 
         self.orm.commit()
         self.orm.refresh(wallet)
