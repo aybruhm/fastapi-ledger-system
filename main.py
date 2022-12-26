@@ -3,6 +3,7 @@ import uvicorn
 
 # FastAPI Imports
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 # Own Imports
 from config.database import db_connect
@@ -21,6 +22,13 @@ app = FastAPI(
     version=ledger_settings.API_VERSION,
     contact=ledger_settings.CONTACT,
     license_info=ledger_settings.LICENSE,
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://0.0.0.0:8000"],
+    allow_methods=["POST", "GET"],
+    allow_headers=["*"],
+    allow_credentials=True
 )
 
 # Include routers to base router
