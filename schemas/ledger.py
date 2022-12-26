@@ -53,6 +53,16 @@ class WalletDeposit(WalletBase):
 
 class WalletWithdraw(WalletBase):
     id: int
+    
+
+class Wallet2WalletTransfer(WalletBase):
+    wallet_from: int
+    wallet_to: int
+    
+
+class Wallet2UserWalletTransfer(WalletBase):
+    wallet_from: int
+    user_wallet_to: int
 
 
 class Wallet(WalletBase):
