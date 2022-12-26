@@ -1,6 +1,3 @@
-# FastAPI Imports
-from fastapi import HTTPException
-
 # SQLAlchemy Imports
 from sqlalchemy.orm import Session
 
