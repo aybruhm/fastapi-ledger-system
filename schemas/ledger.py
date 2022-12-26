@@ -58,13 +58,21 @@ class WalletWithdraw(WalletBase):
 
 
 class Wallet2WalletTransfer(WalletBase):
+    # this will result to:
+    
+    # user: int
+    # amount: int
     wallet_from: int
     wallet_to: int
 
 
-class Wallet2UserWalletTransfer(WalletBase):
-    wallet_from: int
-    wallet_to: int
+class Wallet2UserWalletTransfer(Wallet2WalletTransfer):
+    # this will result to:
+    
+    # user: int
+    # amount: int
+    # wallet_from: int
+    # wallet_to: int
     user_to: int
 
 
