@@ -1,10 +1,18 @@
+# FastAPI Imports
+from fastapi import HTTPException
+
 # SQLAlchemy Imports
 from sqlalchemy.orm import Session
 
 # Own Imports
 from config.database import SessionLocal
 from models.ledger import Wallet as UserWallet
-from schemas.ledger import WalletWithdraw, WalletDeposit
+from schemas.ledger import (
+    Wallet2UserWalletTransfer,
+    WalletWithdraw,
+    WalletDeposit,
+    Wallet2WalletTransfer,
+)
 from orm.ledger import ledger_orm
 from orm.aggregate import ledger_aggregate_orm
 
@@ -32,17 +40,15 @@ class LedgerOperations:
 
         :param deposit: schemas.WalletDeposit
         :type deposit: schemas.WalletDeposit
-
-        :return: The wallet that has been topped up.
         """
 
-        topup_wallet = await ledger_orm.get(deposit.user, deposit.id)
+        topup_wallet = ledger_orm.partial_filter(
+            {"wallet_id": deposit.id, "user_id": deposit.user}
+        )
         topup_wallet.amount += deposit.amount
 
         self.db.commit()
         self.db.refresh(topup_wallet, ["amount"])
-
-        return topup_wallet
 
     async def withdraw_money_from_wallet(
         self, withdraw: WalletWithdraw
@@ -52,37 +58,33 @@ class LedgerOperations:
 
         :param withdraw: schemas.WalletWithdraw
         :type withdraw: schemas.WalletWithdraw
-
-        :return: The wallet that was just updated.
         """
 
-        withdraw_wallet = await ledger_orm.get(withdraw.user, withdraw.id)
+        withdraw_wallet = ledger_orm.partial_filter(
+            {"wallet_id": withdraw.id, "user_id": withdraw.user}
+        )
         withdraw_wallet.amount -= withdraw.amount
 
         self.db.commit()
         self.db.refresh(withdraw_wallet, ["amount"])
 
-        return withdraw_wallet
-
     async def withdraw_from_to_wallet_transfer(
-        self, from_wallet_id: int, withdraw: WalletWithdraw
+        self, withdraw: Wallet2WalletTransfer
     ) -> UserWallet:
         """
-        This function is responsible for transferring x amount 
+        This function is responsible for transferring x amount
         from wallet y to wallet z.
 
-        :param from_wallet_id: The wallet id of the wallet 
-            you want to withdraw from
-        :type from_wallet_id: int
-
-        :param withdraw: schemas.WalletWithdraw
-        :type withdraw: schemas.WalletWithdraw
-
-        :return: The to_wallet is being returned.
+        :param withdraw: schemas.Wallet2WalletTransfer
+        :type withdraw: schemas.Wallet2WalletTransfer
         """
 
-        from_wallet = await ledger_orm.get(withdraw.user, from_wallet_id)
-        to_wallet = await ledger_orm.get(withdraw.user, withdraw.id)
+        from_wallet = ledger_orm.partial_filter(
+            {"wallet_id": withdraw.wallet_from, "user_id": withdraw.user}
+        )
+        to_wallet = ledger_orm.partial_filter(
+            {"wallet_id": withdraw.wallet_to, "user_id": withdraw.user}
+        )
 
         from_wallet.amount -= withdraw.amount
         to_wallet.amount += withdraw.amount
@@ -91,27 +93,25 @@ class LedgerOperations:
         self.db.refresh(from_wallet, ["amount"])
         self.db.refresh(to_wallet, ["amount"])
 
-        return to_wallet
-
     async def withdraw_from_to_user_wallet_transfer(
-        self, user_id: int, wallet_to: int, withdraw: WalletWithdraw
+        self, withdraw: Wallet2UserWalletTransfer
     ) -> UserWallet:
         """
-        This function is responsible for transferring x amount 
+        This function is responsible for transferring x amount
         from wallet y to user z wallet.
 
-        :param from_wallet_id: The wallet id of the wallet 
-            you want to withdraw from
-        :type from_wallet_id: int
-
-        :param withdraw: schemas.WalletWithdraw
-        :type withdraw: schemas.WalletWithdraw
+        :param withdraw: schemas.Wallet2UserWalletTransfer
+        :type withdraw: schemas.Wallet2UserWalletTransfer
 
         :return: The to_wallet is being returned.
         """
 
-        from_wallet = await ledger_orm.get(withdraw.user, withdraw.id)
-        to_wallet = await ledger_orm.get(user_id, wallet_to)
+        from_wallet = ledger_orm.partial_filter(
+            {"wallet_id": withdraw.wallet_from, "user_id": withdraw.user}
+        )
+        to_wallet = ledger_orm.partial_filter(
+            {"wallet_id": withdraw.wallet_to, "user_id": withdraw.user_to}
+        )
 
         from_wallet.amount -= withdraw.amount
         to_wallet.amount += withdraw.amount
