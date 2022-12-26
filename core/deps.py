@@ -63,7 +63,7 @@ async def get_admin_user(
     """
 
     if current_user.is_admin is False:
-        raise HTTPException(401, {"Unauthorized to perform this action!"})
+        raise HTTPException(401, {"message": "Admin priviledge is required!"})
 
     elif current_user is None:
         return None
