@@ -36,7 +36,7 @@ class JWTBearer(HTTPBearer):
         ).__call__(request)
 
         if authorization_credentials:
-            if not authorization_credentials.scheme == "Bearer":
+            if authorization_credentials.scheme != "Bearer":
                 raise HTTPException(403, {"message": "Invalid authentication scheme."})
 
             if not self.verify_jwt_token(authorization_credentials.credentials):
