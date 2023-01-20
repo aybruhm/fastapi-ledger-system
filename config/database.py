@@ -10,8 +10,8 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 from databases import Database
 
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./ledger.sqlite"
-# SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
+# SQLALCHEMY_DATABASE_URL = "sqlite:///./ledger.sqlite"
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
 
 DB_ENGINE = create_engine(
     SQLALCHEMY_DATABASE_URL
