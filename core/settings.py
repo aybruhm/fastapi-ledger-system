@@ -8,9 +8,9 @@ from decouple import config
 class Settings(BaseSettings):
     """Base configuration settings"""
 
-    JWT_SECRET_KEY: str = config("JWT_SECRET")
-    JWT_ALGORITHM: str = config("JWT_ALGORITHM")
-    TOKEN_LIFETIME: int = 30
+    JWT_SECRET_KEY: str = config("JWT_SECRET", cast=str)
+    JWT_ALGORITHM: str = config("JWT_ALGORITHM", cast=str)
+    TOKEN_LIFETIME: int = config("TOKEN_LIFETIME", cast=int)
 
     TITLE: str = "Ledger System"
     DESCRIPTION: str = "A fintech backend ledger system built with FastAPI."
