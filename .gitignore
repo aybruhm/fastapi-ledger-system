@@ -4,3 +4,6 @@ env/
 
 # cache dependencies
 __pycache__/
+
+# db
+test_db.sqlite
