@@ -1,7 +1,6 @@
 # Stdlib Imports
 import sys
 import os
-from typing import Any
 
 # SQLAlchemy Impprts
 from sqlalchemy import create_engine
@@ -37,7 +36,6 @@ def create_tables():
     Base.metadata.create_all(engine)  # Create the tables.
 
 
-@pytest.fixture(scope="function")
 def _get_test_db():
     session = SessionTesting()
     try:
