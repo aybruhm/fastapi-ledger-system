@@ -1,7 +1,7 @@
 # FastAPI Imports
 from fastapi import Depends, HTTPException
 
-# Core Imports
+# Own Imports
 from schemas.user import User
 from users.router import router
 from orm.users import users_orm
