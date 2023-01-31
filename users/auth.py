@@ -20,7 +20,7 @@ async def create_new_user(new_user: UserCreate):
     user = await users_orm.get_email(new_user.email)
 
     if user:
-        raise HTTPException(404, {"message": "User already exists!"})
+        raise HTTPException(400, {"message": "User already exists!"})
     return await create_user(new_user)
 
 
