@@ -1,5 +1,5 @@
 # pull from tiangolo image
-FROM tiangolo/uvicorn-gunicorn:python3.9-slim
+FROM tiangolo/uvicorn-gunicorn:python3.9
 
 # set working directory
 WORKDIR /ledger_be
