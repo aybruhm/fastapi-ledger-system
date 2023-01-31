@@ -26,7 +26,7 @@ password = name + "_weakpassword"
 
 
 @pytest.mark.asyncio
-async def test_create_user():
+async def test_create_user(create_tables):
     payload = {
         "name": "test user",
         "email": email,
@@ -41,7 +41,7 @@ async def test_create_user():
 
 
 @pytest.mark.asyncio
-async def test_login_user_success():
+async def test_login_user_success(create_tables):
     payload = {"email": email, "password": password}
     response = client.post("/login/", data=json.dumps(payload))
 
@@ -49,7 +49,7 @@ async def test_login_user_success():
 
 
 @pytest.mark.asyncio
-async def test_login_user_password_incorrect():
+async def test_login_user_password_incorrect(create_tables):
     payload = {"email": email, "password": "string"}
     response = client.post("/login/", data=json.dumps(payload))
 
@@ -58,7 +58,7 @@ async def test_login_user_password_incorrect():
 
 
 @pytest.mark.asyncio
-async def test_login_user_password_not_exist():
+async def test_login_user_password_not_exist(create_tables):
     payload = {"email": "user@example.com", "password": "string"}
     response = client.post("/login/", data=json.dumps(payload))
 
@@ -84,7 +84,7 @@ async def test_login_user_password_not_exist():
 
 
 @pytest.mark.asyncio
-async def test_user_info():
+async def test_user_info(create_tables):
 
     login_response = client.post(
         "/login/", data=json.dumps({"email": email, "password": password})
