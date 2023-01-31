@@ -14,7 +14,7 @@ SQLALCHEMY_DATABASE_URL = "sqlite:///./ledger.sqlite"
 # SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
 
 DB_ENGINE = create_engine(
-    SQLALCHEMY_DATABASE_URL
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
 )  # connect_args={"check_same_thread": False} is needed only for SQLite.
 # It's not needed for other databases.
 
