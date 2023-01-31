@@ -5,29 +5,10 @@ from fastapi import Depends, HTTPException
 from models.user import User
 from orm.users import users_orm
 from auth.auth_bearer import jwt_bearer
-from config.database import SessionLocal
 
 # 3rd Party Imports
 import jwt
 from decouple import config
-
-
-def get_db():
-    """
-    This function creates a database session,
-    yield it to the get_db function, rollback the transaction
-    if there's an exception and then finally closes the session.
-
-    Yields:
-        db: scoped database session
-    """
-    db = SessionLocal()
-    try:
-        yield db
-    except Exception:
-        db.rollback()
-    finally:
-        db.close()
 
 
 async def get_current_user(token: str = Depends(jwt_bearer)) -> User:
