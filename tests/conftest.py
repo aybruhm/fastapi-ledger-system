@@ -26,14 +26,15 @@ engine = create_engine(
 SessionTesting = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-@pytest.fixture(scope="function")
+
+@pytest.fixture()
 def create_tables():
     """
     Create a fresh database on each test case.
     """
-    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)  # Create the tables.    
     yield
-    Base.metadata.create_all(engine)  # Create the tables.
+    Base.metadata.drop_all(engine)
 
 
 def _get_test_db():
