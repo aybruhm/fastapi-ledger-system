@@ -35,4 +35,4 @@ async def login_user(authenticate: UserLoginSchema):
             return user_token
 
         raise HTTPException(401, {"message": "Password incorrect!"})
-    raise HTTPException(400, {"message": "User does not exist!"})
+    raise HTTPException(404, {"message": "User does not exist!"})
