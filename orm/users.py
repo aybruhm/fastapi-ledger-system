@@ -65,5 +65,20 @@ class UsersORM(BaseUsersORM):
 
         return user
 
+    async def create_admin(
+        self, name: str, email: str, password, is_admin: bool
+    ) -> User:
+        """This method creates an admin user."""
+
+        user = User(
+            name=name, email=email, password=password, is_admin=is_admin
+        )
+
+        self.orm.add(user)
+        self.orm.commit()
+        self.orm.refresh(user)
+
+        return user
+
 
 users_orm = UsersORM(SessionLocal())
