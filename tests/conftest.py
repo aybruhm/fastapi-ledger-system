@@ -5,7 +5,7 @@ import warnings
 
 # SQLAlchemy Impprts
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 
 # Own Imports
 from models.user import Base
@@ -28,7 +28,8 @@ engine = create_engine(
 )
 
 # Use connect_args parameter only with sqlite
-SessionTesting = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+session_factory = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionTesting = scoped_session(session_factory)
 
 
 def create_tables():
