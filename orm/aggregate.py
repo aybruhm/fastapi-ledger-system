@@ -2,7 +2,7 @@
 from sqlalchemy import func
 
 # Own Imports
-from orm.ledger import BaseLedgerORM, Userwallet, SessionLocal
+from orm.ledger import BaseLedgerORM, Userwallet
 
 
 class LedgerAggregateORM(BaseLedgerORM):
@@ -20,4 +20,4 @@ class LedgerAggregateORM(BaseLedgerORM):
         )
 
 
-ledger_aggregate_orm = LedgerAggregateORM(SessionLocal())
+ledger_aggregate_orm = LedgerAggregateORM()

@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str = config("JWT_SECRET", cast=str)
     JWT_ALGORITHM: str = config("JWT_ALGORITHM", cast=str)
     TOKEN_LIFETIME: int = config("TOKEN_LIFETIME", cast=int)
+    USE_TEST_DB: bool = config("USE_TEST_DB", cast=bool)
 
     TITLE: str = "Ledger System"
     DESCRIPTION: str = "A fintech backend ledger system built with FastAPI."

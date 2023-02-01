@@ -7,7 +7,6 @@ from fastapi import HTTPException
 # Own Imports
 from orm.base import ORMSessionMixin
 from schemas.ledger import WalletCreate
-from config.database import SessionLocal
 from models.ledger import Wallet as Userwallet
 
 
@@ -116,8 +115,8 @@ class LedgerORM(BaseLedgerORM):
         # -----------
 
         # solution 1
-        # hange the value directly with the column value
-        wallet = self.partial_list().filter_by(id=wallet_id).update(kwargs)
+        # update the value directly with the column value
+        # wallet = self.partial_list().filter_by(id=wallet_id).update(kwargs)
 
         # solution 2
         # locks row for this particular wallet
@@ -144,4 +143,4 @@ class LedgerORM(BaseLedgerORM):
         return True
 
 
-ledger_orm = LedgerORM(SessionLocal())
+ledger_orm = LedgerORM()

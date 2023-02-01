@@ -31,7 +31,7 @@ class LedgerOperations:
 
     async def deposit_money_to_wallet(
         self, deposit: WalletDeposit
-    ) -> UserWallet:
+    ) -> None:
         """
         This function deposit x amount to the user wallet.
 
@@ -45,11 +45,10 @@ class LedgerOperations:
         topup_wallet.amount += deposit.amount
 
         self.db.commit()
-        self.db.refresh(topup_wallet, ["amount"])
 
     async def withdraw_money_from_wallet(
         self, withdraw: WalletWithdraw
-    ) -> UserWallet:
+    ) -> None:
         """
         The function withdraws x amount from the user wallet.
 
@@ -63,11 +62,10 @@ class LedgerOperations:
         withdraw_wallet.amount -= withdraw.amount
 
         self.db.commit()
-        self.db.refresh(withdraw_wallet, ["amount"])
 
     async def withdraw_from_to_wallet_transfer(
         self, withdraw: Wallet2WalletTransfer
-    ) -> UserWallet:
+    ) -> None:
         """
         This function is responsible for transferring x amount
         from wallet y to wallet z.
@@ -87,20 +85,16 @@ class LedgerOperations:
         to_wallet.amount += withdraw.amount
 
         self.db.commit()
-        self.db.refresh(from_wallet, ["amount"])
-        self.db.refresh(to_wallet, ["amount"])
 
     async def withdraw_from_to_user_wallet_transfer(
         self, withdraw: Wallet2UserWalletTransfer
-    ) -> UserWallet:
+    ) -> None:
         """
         This function is responsible for transferring x amount
         from wallet y to user z wallet.
 
         :param withdraw: schemas.Wallet2UserWalletTransfer
         :type withdraw: schemas.Wallet2UserWalletTransfer
-
-        :return: The to_wallet is being returned.
         """
 
         from_wallet = ledger_orm.partial_filter(
@@ -114,10 +108,6 @@ class LedgerOperations:
         to_wallet.amount += withdraw.amount
 
         self.db.commit()
-        self.db.refresh(from_wallet, ["amount"])
-        self.db.refresh(to_wallet, ["amount"])
-
-        return to_wallet
 
     async def get_total_wallet_balance(self, user_id: int) -> int:
         """
