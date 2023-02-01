@@ -8,13 +8,12 @@ from fastapi.testclient import TestClient
 
 # Own Imports
 from main import app
-from core.deps import get_db
 from orm.users import users_orm
-from tests.conftest import _get_test_db, pytest
+from auth.hashers import pwd_hasher
 
+# Third Party Imports
+import pytest
 
-# override dependecy
-app.dependency_overrides[get_db] = _get_test_db
 
 # initialize test client
 client = TestClient(app)
@@ -26,9 +25,9 @@ password = name + "_weakpassword"
 
 
 @pytest.mark.asyncio
-async def test_create_user(create_tables):
+async def test_create_user():
     payload = {
-        "name": "test user",
+        "name": name,
         "email": email,
         "password": password,
     }
@@ -41,7 +40,7 @@ async def test_create_user(create_tables):
 
 
 @pytest.mark.asyncio
-async def test_login_user_success(create_tables):
+async def test_login_user_success():
     payload = {"email": email, "password": password}
     response = client.post("/login/", data=json.dumps(payload))
 
@@ -49,7 +48,7 @@ async def test_login_user_success(create_tables):
 
 
 @pytest.mark.asyncio
-async def test_login_user_password_incorrect(create_tables):
+async def test_login_user_password_incorrect():
     payload = {"email": email, "password": "string"}
     response = client.post("/login/", data=json.dumps(payload))
 
@@ -58,7 +57,7 @@ async def test_login_user_password_incorrect(create_tables):
 
 
 @pytest.mark.asyncio
-async def test_login_user_password_not_exist(create_tables):
+async def test_login_user_password_not_exist():
     payload = {"email": "user@example.com", "password": "string"}
     response = client.post("/login/", data=json.dumps(payload))
 
@@ -66,25 +65,41 @@ async def test_login_user_password_not_exist(create_tables):
     assert response.json()["detail"]["message"] == "User does not exist!"
 
 
-# @pytest.mark.asyncio
-# async def test_users_info():
+@pytest.mark.asyncio
+async def test_users_info():
 
-#     admin_user = await users_orm.create_admin(name, email, password, True)
-#     login_response = client.post(
-#         "/login/",
-#         data=json.dumps({"email": admin_user.email, "password": password}),
-#     )
-#     token = login_response.json()["access_token"]
+    # set up fake credentials for admin user
+    admin_name = "".join(
+        random.choice(string.ascii_lowercase) for i in range(8)
+    )
+    admin_email = admin_name + "@admin.com"
+    admin_password = admin_name + "_weakpassword"
+    admin_hashed_password = pwd_hasher.hash_password(
+        admin_name + "_weakpassword"
+    )
 
-#     response = client.get(
-#         "/users/", headers={"Authorization": "Bearer " + token}
-#     )
+    # create fake admin user
+    admin_user = await users_orm.create_admin(
+        admin_name, admin_email, admin_hashed_password, True
+    )
 
-#     assert response.status_code == 200
+    login_response = client.post(
+        "/login/",
+        data=json.dumps(
+            {"email": admin_user.email, "password": admin_password}
+        ),
+    )
+    token = login_response.json()["access_token"]
+
+    response = client.get(
+        "/users/", headers={"Authorization": "Bearer " + token}
+    )
+
+    assert response.status_code == 200
 
 
 @pytest.mark.asyncio
-async def test_user_info(create_tables):
+async def test_user_info():
 
     login_response = client.post(
         "/login/", data=json.dumps({"email": email, "password": password})
