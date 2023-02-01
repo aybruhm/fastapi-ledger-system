@@ -8,7 +8,6 @@ from sqlalchemy.orm import joinedload
 from models.user import User
 from schemas.user import UserCreate
 from orm.base import ORMSessionMixin
-from config.database import SessionLocal
 
 
 class BaseUsersORM(ORMSessionMixin):
@@ -81,4 +80,4 @@ class UsersORM(BaseUsersORM):
         return user
 
 
-users_orm = UsersORM(SessionLocal())
+users_orm = UsersORM()
