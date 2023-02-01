@@ -24,7 +24,6 @@ async def create_user() -> Tuple[dict, str]:
     """Function to create a user."""
 
     payload = {"name": name, "email": email, "password": password}
-    print("Email: ", email)
     response = client.post("/register/", data=json.dumps(payload))
     return response.json(), password
 
@@ -34,7 +33,6 @@ async def login_user(u_email: str, u_password: str):
 
     payload = {"email": u_email, "password": u_password}
     response = client.post("/login/", data=json.dumps(payload))
-
     return response.json()["access_token"]
 
 
@@ -182,7 +180,77 @@ async def test_wallet_to_wallet_transfer():
 async def test_wallet_to_user_transfer():
     """Ensure an authenticated user can transfer their account to
     another user's account."""
-    pass
+
+    user_id = await get_user_id(email)
+    token = await login_user(email, password)
+
+    r_user_name = "".join(
+        random.choice(string.ascii_lowercase) for i in range(6)
+    )
+    r_user_email = r_user_name + "@email.com"
+    r_user_password = r_user_name + "_weakpassword"
+
+    receiving_user = client.post(
+        "/register/",
+        data=json.dumps(
+            {
+                "name": r_user_name,
+                "email": r_user_email,
+                "password": r_user_password,
+            }
+        ),
+    )
+    receiving_user_token = await login_user(r_user_email, r_user_password)
+
+    wallet_from = client.post(
+        "/wallets/",
+        data=json.dumps(
+            {
+                "user": user_id,
+                "amount": random.randint(10000, 99999),
+                "title": wallet_title,
+            }
+        ),
+        headers={"Authorization": "Bearer " + token},
+    )
+    wallet_to = client.post(
+        "/wallets/",
+        data=json.dumps(
+            {
+                "user": receiving_user.json()["id"],
+                "amount": random.randint(10000, 99999),
+                "title": wallet_title + "_2",
+            }
+        ),
+        headers={"Authorization": "Bearer " + receiving_user_token},
+    )
+
+    payload = {
+        "user": user_id,
+        "amount": 3000,
+        "wallet_from": wallet_from.json()["id"],
+        "wallet_to": wallet_to.json()["id"],
+        "user_to": receiving_user.json()["id"],
+    }
+    response = client.post(
+        "/transfer/wallet-to-user/",
+        data=json.dumps(payload),
+        headers={"Authorization": "Bearer " + token},
+    )
+
+    assert response.status_code == 200
+    assert wallet_from.status_code == 200
+    assert wallet_to.status_code == 200
+
+    assert (
+        response.json()["message"]
+        == f"Transferred NGN{payload['amount']} \
+            to U#{receiving_user.json()['id']} W#{wallet_to.json()['id']} wallet."
+    )
+    assert wallet_from.json()["user"] == user_id
+    assert wallet_from.json()["title"] == wallet_title
+    assert wallet_to.json()["user"] == receiving_user.json()["id"]
+    assert wallet_to.json()["title"] == wallet_title + "_2"
 
 
 @pytest.mark.asyncio
