@@ -12,7 +12,7 @@ async def login_user():
 
 @pytest.mark.asyncio
 async def test_create_wallet():
-    """Ensure a user can create a wallet."""
+    """Ensure an authenticated user can create a wallet."""
     pass
 
 
@@ -42,7 +42,7 @@ async def test_wallet_to_wallet_transfer():
 
 @pytest.mark.asyncio
 async def test_wallet_to_user_transfer():
-    """Ensure an authenticated user can transfer his their account to
+    """Ensure an authenticated user can transfer their account to
     another user's account."""
     pass
 
