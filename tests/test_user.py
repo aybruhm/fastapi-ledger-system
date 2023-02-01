@@ -26,6 +26,8 @@ password = name + "_weakpassword"
 
 @pytest.mark.asyncio
 async def test_create_user():
+    """Ensure a user can register."""
+    
     payload = {
         "name": name,
         "email": email,
@@ -41,6 +43,8 @@ async def test_create_user():
 
 @pytest.mark.asyncio
 async def test_login_user_success():
+    """Ensure a user can login successfully."""
+    
     payload = {"email": email, "password": password}
     response = client.post("/login/", data=json.dumps(payload))
 
@@ -49,6 +53,8 @@ async def test_login_user_success():
 
 @pytest.mark.asyncio
 async def test_login_user_password_incorrect():
+    """Ensure a user with incorrect password can not login."""
+    
     payload = {"email": email, "password": "string"}
     response = client.post("/login/", data=json.dumps(payload))
 
@@ -58,6 +64,8 @@ async def test_login_user_password_incorrect():
 
 @pytest.mark.asyncio
 async def test_login_user_password_not_exist():
+    """Ensure a user that has no account can not login."""
+    
     payload = {"email": "user@example.com", "password": "string"}
     response = client.post("/login/", data=json.dumps(payload))
 
@@ -67,6 +75,7 @@ async def test_login_user_password_not_exist():
 
 @pytest.mark.asyncio
 async def test_users_info():
+    """Ensure an authenticated user with admin priviledges can get a list of users info."""
 
     # set up fake credentials for admin user
     admin_name = "".join(
@@ -100,6 +109,7 @@ async def test_users_info():
 
 @pytest.mark.asyncio
 async def test_user_info():
+    """Ensure an authenticated user can get their info."""
 
     login_response = client.post(
         "/login/", data=json.dumps({"email": email, "password": password})
