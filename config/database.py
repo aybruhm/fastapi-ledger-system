@@ -19,8 +19,8 @@ DB_ENGINE = create_engine(
 # It's not needed for other databases.
 
 # Construct a session maker
-session_faction = sessionmaker(autocommit=False, autoflush=False, bind=DB_ENGINE)
-SessionLocal = scoped_session(session_faction)
+session_factory = sessionmaker(autocommit=False, autoflush=False, bind=DB_ENGINE)
+SessionLocal = scoped_session(session_factory)
 
 # Construct a base class for declarative class definitions.
 Base = declarative_base()
