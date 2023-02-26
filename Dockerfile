@@ -9,11 +9,11 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # copy requirements file
-COPY requirements.txt .
+COPY requirements.dev.txt .
 
 # install dependencies
 RUN pip install --upgrade pip setuptools wheel \
-    && pip install -r /ledger_be/requirements.txt \
+    && pip install -r /ledger_be/requirements.dev.txt \
     && rm -rf /root/.cache/pip
 
 COPY . /ledger_be/
