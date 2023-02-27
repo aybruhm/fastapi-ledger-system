@@ -1,0 +1,34 @@
+name: Pull Changes & Deploy
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  pull_changes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull New Changes
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /home/ubuntu/fastapi-ledger-system
+            git pull origin dev
+
+  deploy_backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy Backend
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /home/ubuntu/fastapi-ledger-system
+            docker-compose run web alembic upgrade head
