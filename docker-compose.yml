@@ -9,8 +9,6 @@ services:
       - ./:/ledger_be
     ports:
       - 8000:8000
-    expose:
-      - 8000
     environment:
       - DATABASE_URL=postgresql://abram:ledger_b3_2022_db@db/ledger-db
       - TEST_DATABASE_URL=postgresql://abram:ledger_b3_2022_testdb@test_db/ledger-testdb
