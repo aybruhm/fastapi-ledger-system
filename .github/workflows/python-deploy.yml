@@ -2,7 +2,7 @@ name: Pull Changes & Deploy
 on:
   push:
     branches:
-      - dev
+      - main
 
 jobs:
   pull_changes:
@@ -17,7 +17,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /home/ubuntu/fastapi-ledger-system
-            git pull origin dev
+            git pull origin main
 
   deploy_backend:
     runs-on: ubuntu-latest
