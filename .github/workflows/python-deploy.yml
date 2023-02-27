@@ -31,4 +31,4 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /home/ubuntu/fastapi-ledger-system
-            docker-compose run web alembic upgrade head
+            sudo docker-compose run web alembic upgrade head
