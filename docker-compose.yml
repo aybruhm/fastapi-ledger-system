@@ -4,12 +4,13 @@ services:
 
   web:
     build: ./
-    command: |
-      bash -c "while !</dev/tcp/db/5432; do sleep 1; done; python main.py"
+    command: "uvicorn main:app --host='0.0.0.0' --port=8000 --reload"
     volumes:
       - ./:/ledger_be
     ports:
       - 8000:8000
+    expose:
+      - 8000
     environment:
       - DATABASE_URL=postgresql://abram:ledger_b3_2022_db@db/ledger-db
       - TEST_DATABASE_URL=postgresql://abram:ledger_b3_2022_testdb@test_db/ledger-testdb

@@ -25,10 +25,7 @@ app = FastAPI(
 )
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://0.0.0.0:8000",
-        "https://ledger-system.up.railway.app",
-    ],
+    allow_origins=["*"],
     allow_methods=["POST", "GET"],
     allow_headers=["*"],
     allow_credentials=True,
