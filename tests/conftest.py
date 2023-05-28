@@ -1,7 +1,6 @@
 # Stdlib Imports
 import sys
 import os
-import warnings
 
 # SQLAlchemy Impprts
 from sqlalchemy import create_engine
@@ -9,11 +8,6 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 
 # Own Imports
 from models.user import Base
-
-# Third Party Imports
-import pytest
-import alembic
-from alembic.config import Config
 
 
 # this is to include backend dir in sys.path
