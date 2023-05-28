@@ -8,3 +8,6 @@ __pycache__/
 # db
 test_db.sqlite
 ledger.sqlite
+
+# dev
+.vscode
