@@ -115,7 +115,7 @@ class LedgerORM(BaseLedgerORM):
         # -----------
 
         # solution 1
-        # update the value directly with the column value
+        # hange the value directly with the column value
         # wallet = self.partial_list().filter_by(id=wallet_id).update(kwargs)
 
         # solution 2
