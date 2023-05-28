@@ -12,8 +12,9 @@ class ORMSessionMixin:
 
     def __init__(self):
         """
-        If we're not using the test database, then get the next database session from the database pool.
-        Otherwise, get the next database session from the test database pool.
+        If we're not using the test database, then get the next 
+        database session from the database pool. , get the next database session 
+        from the test database pool.
         """
         self.orm: Session = (
             self.get_db().__next__()
